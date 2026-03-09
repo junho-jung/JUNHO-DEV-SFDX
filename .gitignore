@@ -52,3 +52,24 @@ target/
 **/tsconfig*.json
 **/*.tsbuildinfo
 **/graphql.config.yml
+
+# JetBrains IDE
+.idea/
+*.iml
+
+# Build output
+dist/
+build/
+out/
+
+# Test artifacts
+test-results/
+.jest/
+junit.xml
+
+# Salesforce local tracking
+.sfdx/tools/
+
+# Editor temp files
+*.swp
+*.swo
