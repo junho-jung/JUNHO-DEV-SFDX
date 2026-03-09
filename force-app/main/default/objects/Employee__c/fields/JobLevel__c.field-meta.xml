@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>JobLevel__c</fullName>
+    <defaultValue>&apos;책임&apos;</defaultValue>
+    <label>JobLevel</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>책임</fullName>
+                <default>false</default>
+                <label>책임</label>
+            </value>
+            <value>
+                <fullName>이사</fullName>
+                <default>false</default>
+                <label>이사</label>
+            </value>
+            <value>
+                <fullName>영업대표</fullName>
+                <default>false</default>
+                <label>영업대표</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

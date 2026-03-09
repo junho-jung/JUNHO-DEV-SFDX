@@ -1,0 +1,94 @@
+<!--
+- @Author            : jh.jung
+- @Description 		 : 
+- @Target            : 
+- @Modification Log
+- Ver      Date            Author           Modification
+- ===================================================================================
+- 1.0      2026-01-20      jh.jung           Created
+-->
+<!-- Pms Business Unit Summary Table -->
+<template>
+  <div class="summary-wrapper slds-m-bottom_medium">
+    <div class="summary-header slds-p-around_x-small slds-grid slds-grid_vertical-align-center" onclick={handleToggle} style="cursor:pointer;">
+      <lightning-button-icon
+        icon-name={toggleIcon}
+        variant="bare"
+        class="slds-m-right_x-small">
+      </lightning-button-icon>
+      <strong class="slds-text-heading_small">🏢 {headerLabel} 현황</strong>
+    </div>
+
+    <div class="slds-scrollable_x">
+      <template lwc:if={processedData}>
+        <table class="summary-table slds-table slds-table_bordered slds-table_col-bordered">
+          <thead>
+          <tr>
+            <th class="col-label">구분 (팀/인원)</th>
+            <template for:each={monthLabels} for:item="label">
+              <th key={label} class="slds-text-align_center col-mm">{label}</th>
+            </template>
+            <th class="col-total slds-text-align_center">총계 (평균)</th>
+          </tr>
+
+          <tr class="total-row">
+            <td class="summary-label-cell">
+              <div class="team-name-info"><strong>{processedData.total.name}</strong> ({processedData.total.memberCount}명)</div>
+              <div class="label-row">계약 합계 / 인원 (가동률)</div>
+              <div class="label-row actual-label">실제 합계 / 인원 (가동률)</div>
+            </td>
+            <template for:each={processedData.total.monthly} for:item="m">
+              <td key={m.month} class="slds-text-align_center summary-data-cell">
+                <div class="contract-summary-line">
+                  <span>{m.c}</span> <span class="sep">/</span> <span class="count">{processedData.total.memberCount}</span> <span>({m.cUtil}%)</span>
+                </div>
+                <div class="actual-summary-line">
+                  <span class="val-bold">{m.a}</span> <span class="sep">/</span> <span class="count">{processedData.total.memberCount}</span> <span class={m.aUtilClass}>({m.aUtil}%)</span>
+                </div>
+              </td>
+            </template>
+            <td class="slds-text-align_center grand-total-cell">
+              <div class="contract-summary-line">
+                <span>{processedData.total.grandTotal.c}</span> <span class="sep">/</span> <span>{processedData.total.totalCapacity}</span> <span>({processedData.total.grandTotal.cUtil}%)</span>
+              </div>
+              <div class="actual-summary-line">
+                <span class="slds-text-title_bold">{processedData.total.grandTotal.a}</span> <span class="sep">/</span> <span>{processedData.total.totalCapacity}</span> <span class={processedData.total.grandTotal.aUtilClass}>({processedData.total.grandTotal.aUtil}%)</span>
+              </div>
+            </td>
+          </tr>
+          </thead>
+
+          <tbody class={tbodyClass}>
+          <template for:each={processedData.teams} for:item="row">
+            <tr key={row.id}>
+              <td class="summary-label-cell">
+                <div class="team-name-info"><strong>{row.name}</strong> ({row.memberCount}명)</div>
+                <div class="label-row">계약 / 인원 (가동률)</div>
+                <div class="label-row actual-label">실제 / 인원 (가동률)</div>
+              </td>
+              <template for:each={row.monthly} for:item="m">
+                <td key={m.month} class="slds-text-align_center summary-data-cell">
+                  <div class="contract-summary-line">
+                    <span>{m.c}</span> <span class="sep">/</span> <span class="count">{row.memberCount}</span> <span>({m.cUtil}%)</span>
+                  </div>
+                  <div class="actual-summary-line">
+                    <span class="val-bold">{m.a}</span> <span class="sep">/</span> <span class="count">{row.memberCount}</span> <span class={m.aUtilClass}>({m.aUtil}%)</span>
+                  </div>
+                </td>
+              </template>
+              <td class="slds-text-align_center team-grand-total">
+                <div class="contract-summary-line">
+                  <span>{row.grandTotal.c}</span> <span class="sep">/</span> <span>{row.totalCapacity}</span> <span>({row.grandTotal.cUtil}%)</span>
+                </div>
+                <div class="actual-summary-line">
+                  <span class="val-bold">{row.grandTotal.a}</span> <span class="sep">/</span> <span>{row.totalCapacity}</span> <span>({row.grandTotal.aUtil}%)</span>
+                </div>
+              </td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </template>
+    </div>
+  </div>
+</template>

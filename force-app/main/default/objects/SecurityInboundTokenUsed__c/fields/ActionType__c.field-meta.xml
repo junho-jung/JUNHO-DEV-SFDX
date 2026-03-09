@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ActionType__c</fullName>
+    <description>해당 토큰으로 실행된 보안 조치 종류(예: KILL_SESSION, FREEZE_USER 등)</description>
+    <externalId>false</externalId>
+    <label>Action Type</label>
+    <length>50</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

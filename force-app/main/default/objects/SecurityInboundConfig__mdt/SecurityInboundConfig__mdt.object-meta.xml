@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>인바운드 보안 액션 URL 서명 검증용 설정. Default 레코드의 Secret__c를 오그에서 설정하세요.</description>
+    <label>Security Inbound Config</label>
+    <visibility>Public</visibility>
+</CustomObject>

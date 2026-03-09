@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Default</label>
+    <protected>false</protected>
+    <values>
+        <field>AllowedRefererHosts__c</field>
+        <value xsi:type="xsd:string">teams.microsoft.com,teams.e.microsoft.com,teams.cdn.office.net</value>
+    </values>
+    <values>
+        <field>EnableWebhookSignature__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>IsSystemEnabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Secret__c</field>
+        <value xsi:type="xsd:string">testSecretTest</value>
+    </values>
+    <values>
+        <field>ThrottleMaxPerMinute__c</field>
+        <value xsi:type="xsd:double">10.0</value>
+    </values>
+    <values>
+        <field>ValidSeconds__c</field>
+        <value xsi:type="xsd:double">300.0</value>
+    </values>
+</CustomMetadata>

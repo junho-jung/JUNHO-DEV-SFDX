@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ProjectMember__c</fullName>
+    <label>ProjectMember</label>
+    <referenceTo>ProjectMember__c</referenceTo>
+    <relationshipLabel>MonthlyEstimation</relationshipLabel>
+    <relationshipName>MonthlyEstimationList</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

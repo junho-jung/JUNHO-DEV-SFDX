@@ -1,0 +1,57 @@
+<!--
+- @Author            : jh.jung
+- @Description 		 : 
+- @Target            : 
+- @Modification Log
+- Ver      Date            Author           Modification
+- ===================================================================================
+- 1.0      2026-01-28      jh.jung           Created
+-->
+<!-- Table Capture With Preview -->
+<template>
+  <lightning-quick-action-panel header="표 데이터 캡처 및 미리보기">
+    <div class="slds-grid slds-wrap slds-gutters">
+
+      <div class="slds-col slds-size_1-of-1 slds-m-bottom_small slds-text-align_right">
+        <lightning-button variant="neutral" label="취소" onclick={handleCancel}></lightning-button>
+        <lightning-button variant="brand-outline" label="클립보드로 복사" icon-name="utility:copy"
+                          onclick={handleCopy} class="slds-m-left_x-small" disabled={isSaveDisabled}>
+        </lightning-button>
+      </div>
+
+      <div class="slds-col slds-size_1-of-1 slds-m-bottom_medium">
+        <lightning-input-rich-text
+          label="1. 엑셀 표 붙여넣기"
+          value={pastedData}
+          onchange={handleInputChange}
+          placeholder="엑셀에서 복사한 내용을 여기에 붙여넣으세요...">
+        </lightning-input-rich-text>
+
+        <div class="slds-grid slds-grid_align-spread slds-m-top_xx-small">
+          <span class={characterCountClass}>현재 글자 수: {currentCharacterCount} / 131,072</span>
+          <template if:true={isOverLimit}>
+            <span class="slds-text-color_error slds-text-title_bold">용량 초과: 복사할 수 없습니다.</span>
+          </template>
+        </div>
+      </div>
+
+      <div class="slds-col slds-size_1-of-1">
+        <div class="slds-box slds-theme_shade">
+          <span class="slds-text-title_caps slds-m-bottom_x-small slds-display_block">적용될 서식 미리보기</span>
+          <div class="preview-container slds-bg-color_white slds-p-around_small" style="border: 1px dashed #ccc; min-height: 150px;">
+            <lightning-formatted-rich-text value={formattedPreview}></lightning-formatted-rich-text>
+          </div>
+        </div>
+      </div>
+
+      <div class="slds-col slds-size_1-of-1 slds-m-top_medium"></div>
+    </div>
+
+    <div slot="footer">
+      <lightning-button variant="neutral" label="취소" onclick={handleCancel}></lightning-button>
+      <lightning-button variant="brand-outline" label="클립보드로 복사" icon-name="utility:copy"
+                        onclick={handleCopy} class="slds-m-left_x-small" disabled={isSaveDisabled}>
+      </lightning-button>
+    </div>
+  </lightning-quick-action-panel>
+</template>

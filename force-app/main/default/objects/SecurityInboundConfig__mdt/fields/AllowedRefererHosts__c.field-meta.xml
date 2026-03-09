@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AllowedRefererHosts__c</fullName>
+    <description>허용 Referer/Origin 호스트(쉼표 구분). 팀즈만 허용 시: teams.microsoft.com,teams.e.microsoft.com. 비우면 출처 검사 생략.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Allowed Referer Hosts</label>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

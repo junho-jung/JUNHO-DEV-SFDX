@@ -1,0 +1,23 @@
+<!--
+- @Author            : jh.jung
+- @Description 		 : 
+- @Target            : 
+- @Modification Log
+- Ver      Date            Author           Modification
+- ===================================================================================
+- 1.0      2025-12-16      jh.jung           Created
+-->
+<!-- Lead Map -->
+<template>
+  <div class="map-wrap">
+    <lightning-combobox
+      name="progress"
+      label="생성일자 기준 리드 필터"
+      value={markerFilterValue}
+      placeholder="Select Progress"
+      options={markerFilterOptions}
+      onchange={handleFilterChange}>
+    </lightning-combobox>
+    <iframe src="/apex/KakaoMap?isdtp=p1" onload={handleLoad}></iframe>
+  </div>
+</template>

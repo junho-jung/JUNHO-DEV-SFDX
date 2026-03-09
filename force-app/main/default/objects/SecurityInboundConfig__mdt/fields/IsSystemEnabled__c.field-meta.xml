@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>IsSystemEnabled__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>false면 SOAR 전체 Kill-Switch. 액션 실행 및 인바운드 처리 중단.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Is System Enabled</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,87 @@
+<template>
+    <lightning-card title="SOAR 통합 시뮬레이터 (Simulation Suite)" icon-name="custom:custom62">
+        <div class="slds-p-around_medium">
+            <!-- 공통: 타겟 설정 영역 -->
+            <div class="slds-m-bottom_medium">
+                <lightning-record-picker label="시뮬레이션 대상 사용자 (Target User)" object-api-name="User" value={targetUserId}
+                    onchange={handleUserIdChange} required placeholder="사용자 검색...">
+                </lightning-record-picker>
+            </div>
+
+            <lightning-tabset variant="scoped">
+                <!-- 탭 1: 탐지 이벤트 모의 -->
+                <lightning-tab label="탐지 이벤트 모의 (Event Generation)" icon-name="utility:warning">
+                    <div class="slds-box slds-theme_default slds-m-bottom_medium">
+                        <p class="slds-text-heading_small slds-m-bottom_small">
+                            <lightning-icon icon-name="utility:info" size="small"
+                                class="slds-m-right_x-small"></lightning-icon>
+                            이벤트 시뮬레이터 안내
+                        </p>
+                        <p>순수하게 <b>SecurityAlert__e (탐지 이벤트)</b>만 위조 발행하여 SOAR 코어 엔진(임계치 누적, 차단 액션 등)의 동작을 화면에서 안전하게
+                            테스트합니다.</p>
+                    </div>
+                    <div class="slds-grid slds-gutters slds-wrap">
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-m-bottom_small">
+                            <div class="slds-box slds-box_x-small slds-theme_shade">
+                                <p class="slds-text-heading_small slds-m-bottom_small"><b>[1회 타격]</b> 데이터 유출 모의</p>
+                                <p class="slds-text-color_weak slds-m-bottom_small">Policy: DATA_EXPORT (1회 발생)</p>
+                                <lightning-button variant="brand" label="경고 로직 테스트 (Low)" icon-name="utility:warning"
+                                    onclick={handleSimulateLow} disabled={isExecuting}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-m-bottom_small">
+                            <div class="slds-box slds-box_x-small slds-text-color_error"
+                                style="border-color: #ba0517; background-color: #fff9f9;">
+                                <p class="slds-text-heading_small slds-m-bottom_small"><b>[5회 연사]</b> 치명적 공격 모의</p>
+                                <p class="slds-text-color_weak slds-m-bottom_small">Policy: DATA_EXPORT (5회 연속 발생)</p>
+                                <lightning-button variant="destructive" label="임계치 돌파 (Critical / Freeze)"
+                                    icon-name="utility:bolt" onclick={handleSimulateCritical} disabled={isExecuting}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </lightning-tab>
+
+                <!-- 탭 2: 보안 조치 직접 실행 -->
+                <lightning-tab label="보안 조치 수동 타격 (Action Execution)" icon-name="utility:warning">
+                    <div class="slds-box slds-theme_default slds-m-bottom_medium">
+                        <p class="slds-text-heading_small slds-m-bottom_small">
+                            <lightning-icon icon-name="utility:info" size="small"
+                                class="slds-m-right_x-small"></lightning-icon>
+                            액션 시뮬레이터 안내
+                        </p>
+                        <p>원하는 <b>보안 조치(Action)</b>를 특정 <b>발생 출처(Source)</b>에서 시작된 것처럼 속여서
+                            <b>SecurityActionRequest__e</b> 이벤트를 발행합니다. <br />출처에 따른 조건부 로직(예: Teams 인바운드일 때만 알림 전송) 검증에
+                            유용합니다.</p>
+                    </div>
+
+                    <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-m-bottom_small">
+                            <lightning-combobox name="actionType" label="실행할 액션 (Action Type)" value={selectedAction}
+                                placeholder="액션을 선택하세요" options={actionOptions} onchange={handleActionChange} required>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-m-bottom_small">
+                            <lightning-combobox name="actionSource" label="모의 출처 (Origin Source)" value={selectedSource}
+                                placeholder="요청 출처를 선택하세요" options={sourceOptions} onchange={handleSourceChange}
+                                required>
+                            </lightning-combobox>
+                        </div>
+                    </div>
+
+                    <div class="slds-text-align_right">
+                        <lightning-button variant="brand" label="액션 즉시 실행 (Simulate Action)" icon-name="utility:play"
+                            onclick={handleSimulateAction} disabled={isExecuting}>
+                        </lightning-button>
+                    </div>
+                </lightning-tab>
+            </lightning-tabset>
+
+            <!-- 스피너 (로딩 상태) -->
+            <template if:true={isExecuting}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+        </div>
+    </lightning-card>
+</template>

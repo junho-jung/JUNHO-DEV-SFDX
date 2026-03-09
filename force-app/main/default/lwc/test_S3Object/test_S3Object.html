@@ -1,0 +1,39 @@
+<template>
+    <!-- <lightning-file-upload
+        label="Attach receipt"
+        name="fileUploader"
+        accept={acceptedFormats}
+        record-id={myRecordId}
+        onuploadfinished={handleUploadFinished}
+        multiple
+    >
+    </lightning-file-upload> -->
+    <lightning-card title="Files" icon-name="custom:custom14">
+      <!--
+      <div class="slds-form-element">
+        <div class="slds-form-element__control">
+          <div class="slds-file-selector slds-file-selector_files">
+            <div class="slds-file-selector__dropzone">
+              <input type="file" class="slds-file-selector__input slds-assistive-text" accept=".txt,.pdf,.pptx,.docx,.xlsx" onchange={handleFilesChange} id="file-upload-input-107" aria-labelledby="file-selector-primary-label-105 file-selector-secondary-label106" multiple />
+              <label class="slds-file-selector__body" for="file-upload-input-107" id="file-selector-secondary-label106">
+                <span class="slds-file-selector__button slds-button slds-button_neutral">
+                  <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#upload"></use>
+                  </svg>Upload Files</span>
+                  <span class="slds-file-selector__text slds-medium-show">or Drop Files</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      -->
+      <lightning-input accept=".txt,.pdf,.pptx,.docx,.xlsx" multiple="true" type="file" onchange={handleFilesChange} slot="actions"></lightning-input>
+        <lightning-datatable
+                key-field="id"
+                data={data}
+                columns={columns}
+                hide-checkbox-column
+                onrowaction={handleRowAction}>
+        </lightning-datatable>
+      </lightning-card>
+</template>

@@ -1,0 +1,28 @@
+/*************************************************************
+ * @author : jh.jung
+ * @date : 2026-01-14
+ * @description :
+ * @target :
+==============================================================
+ * Ver          Date            Author          Modification
+ * 1.0          2026-01-14      jh.jung         Initial Version
+**************************************************************/
+
+/* 히트맵 배경색 정의 */
+.status-none { background-color: transparent; }
+
+.status-low {
+    background-color: #e0f7fa; /* 연한 하늘색 */
+    color: #006064;
+}
+
+.status-normal {
+    background-color: #e8f5e9; /* 연한 초록색 */
+    color: #1b5e20;
+}
+
+.status-over {
+    background-color: #ffebee; /* 연한 빨간색 */
+    color: #b71c1c;
+    box-shadow: inset 0 0 0 1px #ef9a9a; /* 과부하 시 테두리 강조 */
+}

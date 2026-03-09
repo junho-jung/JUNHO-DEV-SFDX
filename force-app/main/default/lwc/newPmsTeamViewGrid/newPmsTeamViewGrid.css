@@ -1,0 +1,89 @@
+/*************************************************************
+ * @author : jh.jung
+ * @date : 2025-12-29
+ * @description : 
+ * @target : 
+==============================================================
+ * Ver          Date            Author          Modification
+ * 1.0          2025-12-29      jh.jung         Initial Version
+**************************************************************/
+
+.team-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.col-name { width: 140px; }
+.col-proj { width: 180px; }
+.col-mm { width: 95px; }
+
+.team-header {
+    background-color: #f3f3f3;
+    border-left: 4px solid #0070d2;
+    margin-bottom: -1px;
+}
+
+.role-text { font-size: 0.75rem; color: #747474; }
+
+.project-name-label {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 셀 데이터 영역 */
+.cell-mm-data {
+    vertical-align: middle;
+    padding: 4px !important;
+    transition: background-color 0.2s;
+}
+
+.detail-rows {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 32px;
+}
+
+.detail-val {
+    font-size: 0.75rem;
+    text-align: center;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+/* 프로젝트 단위 라인 공통 스타일 */
+.project-name-label,
+.detail-val {
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.20);
+}
+
+/* 마지막 프로젝트는 라인 제거 */
+.project-name-label:last-child,
+.detail-val:last-child {
+    border-bottom: none;
+}
+
+
+
+/* 히트맵 배경색 정의 */
+.status-none { background-color: transparent; }
+
+.status-low {
+    background-color: #e0f7fa; /* 연한 하늘색 */
+    color: #006064;
+}
+
+.status-normal {
+    background-color: #e8f5e9; /* 연한 초록색 */
+    color: #1b5e20;
+}
+
+.status-over {
+    background-color: #ffebee; /* 연한 빨간색 */
+    color: #b71c1c;
+    box-shadow: inset 0 0 0 1px #ef9a9a; /* 과부하 시 테두리 강조 */
+}

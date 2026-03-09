@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>customRichText</masterLabel>
+
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+
+            <!-- Object API Name -->
+            <property
+                    name="objectApiName"
+                    type="String"
+                    label="Object API Name"
+                    description="예: Account, Contact"
+                    required="true"/>
+
+            <!-- Field API Name -->
+            <property
+                    name="fieldApiName"
+                    type="String"
+                    label="Field API Name"
+                    description="예: Description__c"
+                    required="true"/>
+
+            <property
+                    name="sectionLabel"
+                    type="String"
+                    label="Section Label"
+                    description="섹션 제목"
+                    default="Section" />
+
+            <property
+                    name="isOpen"
+                    type="Boolean"
+                    label="Expanded by Default"
+                    description="기본으로 섹션을 펼칠지 여부"
+                    default="true" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

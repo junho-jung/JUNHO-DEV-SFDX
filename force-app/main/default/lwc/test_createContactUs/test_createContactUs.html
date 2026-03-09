@@ -1,0 +1,53 @@
+<template>
+    <div class="main-box">
+        <lightning-card  title="Contact Us">
+            <div style="font-size:15px; padding:4px; margin-left: 20px;">For general business inquiries, please contact your Sales Representatives</div>
+                <div class="slds-box sub-box">
+                    <div class="slds-p-around_medium lgc-bg">
+                        <lightning-combobox
+                            label="Category"
+                            value={categoryValue}
+                            placeholder="Select Category"
+                            options={categoryOptions}
+                            onchange={handleComboBox}
+                            required>
+                        </lightning-combobox>
+                        <br/>
+                        <h4>Inquiry Form</h4>
+                        <lightning-input type="text" name="Email" label="your Email" placeholder="Please write your email" onchange={handleInput} onblur={checkInputVelidate}  required=""></lightning-input>
+                        <template if:false={emailValidateFlag}>
+                            <div class="slds-text-color_error">Email이 유효하지 않습니다</div>
+                        </template><br/>
+                        <lightning-input type="text" name="Subject" label="Subject" placeholder="Please write the subject" onchange={handleInput} required></lightning-input><br/>
+                        <!-- <lightning-input type="text" name="Description" label="Description" placeholder="Please write the subject" onchange={handleInput} required></lightning-input><br/> -->
+                        <lightning-textarea name="Description" label="Description" placeholder="Please write the subject" onchange={handleInput} required></lightning-textarea>
+                        <lightning-input type="text" name="Colaborators" label="Colaborators" placeholder="Add CC email 'Enter key'"
+                            value={CCInput} onkeydown={handleKeyDown} onchange={handleInput}></lightning-input>
+                        <!-- CC pill list-->
+                        <template for:each={CCList} for:item="CCItem">
+                            <lightning-pill label={CCItem} key={CCItem.index} onremove={handleRemoveCC}></lightning-pill>
+                        </template><br/>
+
+
+                        <lightning-file-upload
+                            label="Attachment"
+                            name="fileUploader"
+                            accept={acceptedFormats}
+                            record-id={myRecordId}
+                            file-field-name="Guest_Record_fileupload__c"
+                            file-field-value={encryptedToken}
+                            onuploadfinished={handleUploadFinished}
+                            multiple
+                        ></lightning-file-upload>
+                        <!-- file pill list -->
+                        <template for:each={fileList} for:item="fileItem">
+                            <lightning-pill label={fileItem.name} key={fileItem.index} onremove={handleRemoveFile}></lightning-pill>
+                        </template><br/>
+                        <button class="slds-button slds-button_brand slds-align_absolute-center" onclick={submitEvent}>Submit</button>
+                    </div>
+                </div>
+        </lightning-card>
+    </div>  
+
+
+</template>

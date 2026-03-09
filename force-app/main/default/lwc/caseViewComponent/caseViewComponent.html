@@ -1,0 +1,99 @@
+<!--
+ * @author : jh.jung
+ * @date : 2024-08-05
+ * @description :
+ * @target :
+==============================================================
+ * Ver          Date            Author          Modification
+ * 1.0          2024-08-05      jh.jung         Initial Version
+-->
+<!-- Case View Component -->
+<template>
+  <div class="container slds-grid slds-wrap slds-size_1-of-1 slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+    <div class="content-header">
+      <div class="title">
+        <h6 id="modal-heading-02" class="slds-text-heading_large slds-hyphenate">Maintenance Result Sheet</h6>
+      </div>
+      <div class="header-button">
+        <lightning-button-group>
+          <button class="btn slds-button slds-button_neutral" label="수정" onclick={editCurrentRecord}>수정</button>
+          <button class="btn slds-button slds-button_neutral" label="저장" onclick={doSave}>저장</button>
+        </lightning-button-group>
+      </div>
+    </div>
+    <div class="content-body">
+      <table>
+        <thead>
+        <tr>
+          <th>고객명</th>
+          <td>{accountName}</td>
+          <th>점검자</th>
+          <td>{ownerName}</td>
+        </tr>
+        <tr>
+          <th>모델명</th>
+          <td>{model}</td>
+          <th>설치일자</th>
+          <td>{installationDate}</td>
+        </tr>
+        <tr>
+          <th>System S/N</th>
+          <td>{sn}</td>
+          <th>Warranty</th>
+          <td>{warranty}</td>
+        </tr>
+        <tr>
+          <th>실행일자</th>
+          <td colspan="3">{userCreatedDate} ~ {userClosedDate}</td>
+        </tr>
+        </thead>
+      </table>
+      <table>
+        <tbody>
+        <tr>
+          <th style="width: 12.5%;">Title</th>
+          <th style="width: 12.5%;">Task</th>
+          <th style="width: 50%;">Description</th>
+          <th style="width: 12.5%;">Result</th>
+          <th style="width: 12.5%;">Note</th>
+        </tr>
+        <template for:each={itemsWithIndexZero} for:item="data" for:index="index">
+          <tr key={data}>
+            <template if:true={data.isIndexZero}>
+              <td rowspan={description.length}>Console Inspection</td>
+              <td rowspan={description.length}>Console Visual</td>
+            </template>
+            <td>{data.item}</td>
+            <td class="center">
+              <template if:true={data.radio}>
+                <input type="radio" name={data.id} value="1" onchange={changeRadio} checked> Pass &nbsp;&nbsp;
+                <input type="radio" name={data.id} value="0" onchange={changeRadio}> Fail
+              </template>
+              <template if:false={data.radio}>
+                <input type="radio" name={data.id} value="1" onchange={changeRadio}> Pass &nbsp;&nbsp;
+                <input type="radio" name={data.id} value="0" onchange={changeRadio} checked> Fail
+              </template>
+            </td>
+            <td></td>
+          </tr>
+        </template>
+        <tr>
+          <th>기타 의견</th>
+          <td colspan="4" style= "height: 6vw;">{others}</td>
+        </tr>
+        </tbody>
+      </table>
+      <table>
+        <tfoot>
+        <tr>
+          <th style="width: 12.5%;">고객확인</th>
+          <td style="width: 25%;">부서명: {contactDepartment}</td>
+          <td style="width: 25%;">직책: {contactTitle}</td>
+          <td style="width: 25%;">성명: {contactName}</td>
+          <td style="width: 12.5%;">(확인)</td>
+        </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</template>

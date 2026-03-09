@@ -1,0 +1,74 @@
+<template>
+    <section class={sectionClass}>
+
+        <template lwc:if={isHideSection}>
+
+        </template>
+        <template lwc:else>
+            <h3 class="slds-section__title">
+                <button type="button" class="slds-button slds-section__title-action" aria-expanded={isOpen}
+                    aria-controls="customrichtext" onclick={toggle}>
+                    <lightning-icon class="slds-section__title-action-icon
+                    slds-button__icon
+                    slds-button__icon_left
+                    slds-icon-utility-switch
+                    slds-icon_container" icon-name="utility:switch" size="x-small"></lightning-icon>
+
+                    <span title={sectionLabel}>{sectionLabel}</span>
+                </button>
+            </h3>
+        </template>
+
+
+
+        <div id="customrichtext" class="slds-section__content" lwc:if={_isOpen}>
+            <template if:false= {showModal}>
+                <div class="label-row">
+                    <div class="slds-form-element__label">
+                        {fieldLabel}
+                    </div>
+                    <div class="button-group">
+                        <lightning-button variant="neutral" label="크게보기" onclick={openModal} icon-name="utility:preview"
+                            class="btn-expand"></lightning-button>
+                        <template if:false={hideSaveButton}>
+                            <lightning-button variant="brand" label="저장" onclick={handleSave}></lightning-button>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <section role="dialog" tabindex="-1" class={modalContainerClass} aria-labelledby="modal-heading"
+                aria-modal="true">
+                <div class={modalInnerClass}>
+                    <template lwc:if={showModal}>
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="닫기" onclick={closeModal} aria-label="닫기">
+                                <lightning-icon icon-name="utility:close" alternative-text="닫기"
+                                    size="small"></lightning-icon>
+                            </button>
+                            <h2 id="modal-heading" class="slds-modal__title slds-truncate">{fieldLabel}</h2>
+                        </header>
+                    </template>
+
+                    <div class={modalContentClass} id="modal-content">
+                        <div class={editorWrapClass}>
+                            <iframe class={iframeClass} src={vfUrl} title="customRichTextVF"></iframe>
+                        </div>
+                    </div>
+
+                    <template lwc:if={showModal}>
+                        <footer class="slds-modal__footer">
+                            <lightning-button variant="neutral" label="닫기" onclick={closeModal}></lightning-button>
+                            <lightning-button variant="brand" label="저장" onclick={handleSave}></lightning-button>
+                        </footer>
+                    </template>
+                </div>
+            </section>
+
+            <template lwc:if={showModal}>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+        </div>
+    </section>
+</template>

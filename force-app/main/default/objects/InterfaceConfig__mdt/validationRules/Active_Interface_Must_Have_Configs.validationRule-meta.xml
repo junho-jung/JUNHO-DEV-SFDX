@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_Interface_Must_Have_Configs</fullName>
+    <active>true</active>
+    <description>활성화 시 필수 값 체크</description>
+    <errorConditionFormula>AND(
+    isActive__c = True,
+    OR(
+        ISBLANK(ImplementationClassName__c),
+        ISBLANK(NamedCredential__c), 
+        ISBLANK(Method__c)
+    )
+)</errorConditionFormula>
+    <errorMessage>활성화 하려면 구현클래스, 명명된 자격 증명가 필요합니다.</errorMessage>
+</ValidationRule>

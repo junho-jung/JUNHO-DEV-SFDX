@@ -1,0 +1,23 @@
+<template>
+    <section class="slds-section slds-m-bottom_medium">
+        <template for:each={fields} for:item="field">
+            <c-custom-rich-text
+                    key={field.fieldApiName}
+                    object-api-name={objectApiName}
+                    field-api-name={field.fieldApiName}
+                    record-id={recordId}
+                    section-label={field.sectionLabel}
+                    is-open={isOpen}
+                    hide-save-button={hideChildSaveButtons}
+            >
+            </c-custom-rich-text>
+        </template>
+        <div class="header-row">
+            <lightning-button
+                    variant="brand"
+                    label="저장"
+                    onclick={handleSaveAll}
+            ></lightning-button>
+        </div>
+    </section>
+</template>

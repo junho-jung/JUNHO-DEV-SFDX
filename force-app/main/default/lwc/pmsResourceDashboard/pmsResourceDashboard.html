@@ -1,0 +1,155 @@
+<!--
+- @Author            : jh.jung
+- @Description 		 : 
+- @Target            : 
+- @Modification Log
+- Ver      Date            Author           Modification
+- ===================================================================================
+- 1.0      2026-01-06      jh.jung           Created
+-->
+<!-- Pms Resource Dashboard -->
+<template>
+  <lightning-card title="M/M 가동률 관리 시스템" icon-name="standard:rtc_presence">
+    <!--    [1] View 탭 메뉴: 팀별 상세 / 팀별 롤업 / 프로젝트별 뷰 전환-->
+    <lightning-tabset variant="scoped" active-tab-value={viewMode}>
+      <lightning-tab label="팀별 뷰(상세)" value="team" onactive={handleTabActive}></lightning-tab>
+      <lightning-tab label="팀별 뷰(롤업)" value="teamRollup" onactive={handleTabActive}></lightning-tab>
+      <lightning-tab label="프로젝트별 뷰" value="project" onactive={handleTabActive}></lightning-tab>
+    </lightning-tabset>
+
+    <!--    메인 컨텐츠 컨테이너 영역 (배경 및 최소 높이 설정)-->
+    <div class="slds-container_fluid slds-p-around_medium slds-border_right slds-border_left slds-border_bottom" style="background: white; margin-top: -1px; min-height: 600px;">
+      <!--      [2] 필터 섹션: 부서 계층(사업부/본부/팀), 연도, 수주확도 제어-->
+      <div class="slds-grid slds-grid_vertical-align-end slds-grid_align-spread slds-m-bottom_large">
+        <!--        연도 필터-->
+        <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+          <lightning-combobox label="연도" value={selectedYear} options={yearOptions} onchange={handleFilterChange} data-name="year"></lightning-combobox>
+        </div>
+        <!--        부서 계층 필터 (Division > BusinessUnit)-->
+        <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+          <lightning-combobox label="사업부" value={selectedDivision} options={divisionOptions} onchange={handleFilterChange} data-name="division"></lightning-combobox>
+        </div>
+        <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+          <lightning-combobox label="하위조직" value={selectedBusinessUnit} options={businessUnitOptions} onchange={handleFilterChange} data-name="businessUnit"></lightning-combobox>
+        </div>
+        <!--        팀 선택 필터 (팀 관련 뷰에서만 노출)-->
+        <template lwc:if={showTeamRelatedView}>
+          <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+            <lightning-combobox label="팀" value={selectedTeam} options={teamOptions} onchange={handleFilterChange} data-name="team"></lightning-combobox>
+          </div>
+        </template>
+        <!--        수주확도 필터 (WON/NONE 특수 필터 로직 포함)-->
+        <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+          <lightning-combobox label="수주확도" value={selectedProbability} options={probabilityOptions} onchange={handleFilterChange} data-name="probability"></lightning-combobox>
+        </div>
+        <!--        프로젝트 다중 선택 메뉴 (프로젝트 뷰 모드 전용)-->
+        <template lwc:if={isProjectView}>
+          <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+            <lightning-button-menu label={projectLabel} onselect={handleProjectSelect} variant="border-filled">
+              <template for:each={projectOptions} for:item="opt">
+                <lightning-menu-item key={opt.value} label={opt.label} value={opt.value} checked={opt.checked}></lightning-menu-item>
+              </template>
+            </lightning-button-menu>
+          </div>
+        </template>
+
+        <!--        [3] 상단 가동률 대시보드: 단순 가동률 & 가중 가동률 (Progress Bar)-->
+        <template lwc:if={showTeamRelatedView}>
+          <div class="slds-col slds-m-right_none slds-size_2-of-8">
+            <!--            단순 가동률: 전체 인원 대비 배정 MM 비중-->
+            <div class="slds-m-bottom_small">
+              <div class="slds-grid slds-grid_align-spread slds-p-bottom_xx-small">
+                <span class="slds-text-title_bold">{selectedBusinessUnitLabel} 단순 가동률</span>
+                <span class="slds-text-title_bold">{totalUtilization}%</span>
+              </div>
+              <div class="slds-progress-bar slds-progress-bar_medium" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={totalUtilization}>
+                <span class="slds-progress-bar__value" style={totalProgressStyle}>
+                  <span class="slds-assistive-text">Progress: {totalUtilization}%</span>
+                </span>
+              </div>
+            </div>
+            <!--            가중 가동률: 확도별 가중치를 적용한 리소스 예측 지표-->
+            <div>
+              <div class="slds-grid slds-grid_align-spread slds-p-bottom_xx-small">
+                <span class="slds-text-title_bold slds-text-color_success">{selectedBusinessUnitLabel} 가중 가동률</span>
+                <span class="slds-text-title_bold slds-text-color_success">{weightedUtilization}%</span>
+              </div>
+              <div class="slds-progress-bar slds-progress-bar_medium" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={weightedUtilization}>
+                <span class="slds-progress-bar__value" style={weightedProgressStyle}>
+                  <span class="slds-assistive-text">Progress: {weightedUtilization}%</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </template>
+        <!--        조회/편집 모드 전환 버튼 (프로젝트 뷰 전용)-->
+        <template lwc:if={isProjectView}>
+          <div class="slds-col slds-button__icon_right slds-size_2-of-8">
+            <lightning-button-group>
+              <lightning-button label="조회" variant={viewModeVariant} icon-name="utility:preview" onclick={handleModeChange} data-mode="read"></lightning-button>
+              <lightning-button label="편집" variant={editModeVariant} icon-name="utility:edit" onclick={handleModeChange} data-mode="edit"></lightning-button>
+            </lightning-button-group>
+          </div>
+          <!--          <template lwc:if={isReadOnlyMode}>-->
+          <!--            <lightning-button-icon-->
+          <!--              icon-name="utility:refresh"-->
+          <!--              variant="border-filled"-->
+          <!--              alternative-text="데이터 새로고침"-->
+          <!--              title="데이터 새로고침"-->
+          <!--              onclick={handleRefreshData}-->
+          <!--              class="slds-m-left_x-small">-->
+          <!--            </lightning-button-icon>-->
+          <!--          </template>-->
+        </template>
+      </div>
+
+      <!--      [4] 데이터 그리드 영역: 소계 테이블 및 뷰별 메인 그리드-->
+      <div class="grid-container slds-is-relative">
+        <!--        본부 전체 가동률 소계 테이블 (상단 고정 노출)-->
+        <c-pms-business-unit-summary-table
+          lwc:if={showTeamRelatedView}
+          allocations-data={buSummaryData}
+          current-half={selectedHalf}
+          header-label={selectedBusinessUnitLabel}>
+        </c-pms-business-unit-summary-table>
+        <!--        [View 분기] 팀별 상세 뷰-->
+        <c-pms-team-view-grid
+          lwc:if={isTeamView}
+          allocations={originalData}
+          current-half={selectedHalf}
+        ></c-pms-team-view-grid>
+        <!--        [View 분기] 팀별 롤업(집계) 뷰-->
+        <c-pms-team-view-grid-roll-up
+          lwc:if={isTeamRollupView}
+          allocations={originalData}
+          current-half={selectedHalf}
+        ></c-pms-team-view-grid-roll-up>
+        <!--        [View 분기] 프로젝트 상세 뷰 (편집 및 저장 기능 지원)-->
+        <c-pms-project-view-grid
+          lwc:if={isProjectView}
+          allocations={originalData}
+          current-half={selectedHalf}
+          current-year={selectedYear}
+          is-read-only={isReadOnlyMode}
+          draft-values={draftValues}
+          ondashboardaction={handleDashboardAction}
+        ></c-pms-project-view-grid>
+      </div>
+    </div>
+
+    <!--    [5] 하단 액션: 편집 모드 시 저장/취소 버튼 노출-->
+    <div slot="actions">
+      <template lwc:if={showEditActions}>
+        <lightning-button label="취소" onclick={handleCancel} class="slds-m-right_x-small"></lightning-button>
+        <lightning-button label="전체 저장" variant="brand" onclick={handleSave}></lightning-button>
+      </template>
+    </div>
+
+    <!--    [6] 글로벌 로딩 스피너 (Apex 통신 중 사용자 인터랙션 차단)-->
+    <template lwc:if={isLoading}>
+      <div class="spinner-overlay">
+        <lightning-spinner size="medium" alternative-text="처리 중..."></lightning-spinner>
+      </div>
+    </template>
+  </lightning-card>
+</template>

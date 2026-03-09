@@ -1,0 +1,138 @@
+/*************************************************************
+ * @author : jh.jung
+ * @date : 2026-01-20
+ * @description :
+ * @target :
+==============================================================
+ * Ver          Date            Author          Modification
+ * 1.0          2026-01-20      jh.jung         Initial Version
+**************************************************************/
+
+.summary-wrapper {
+    border: 1px solid #0070d2;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.summary-header {
+    background-color: #ffffff;
+    border-bottom: 2px solid #0070d2;
+    padding: 10px 12px;
+}
+
+.summary-data-cell {
+    min-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 넘치는 텍스트는 ...으로 처리 (선택사항) */
+    white-space: nowrap;     /* 데이터를 한 줄로 유지 */
+}
+
+.summary-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem; /* 전체적으로 가독성 좋게 키움 */
+    color: #080808; /* 모든 기본 글자를 진하게 */
+    min-width: 1200px;
+}
+
+/* 헤더 텍스트 강화 */
+.summary-table th {
+    background-color: #f8f9fb;
+    font-weight: 800;
+    color: #00396b; /* 진한 남색 */
+    border-bottom: 2px solid #a8b7c7;
+    padding: 10px 4px;
+}
+
+.summary-table td {
+    border: 1px solid #d8dde6;
+    padding: 8px 6px;
+}
+
+/* 행 구분 레이블 셀 */
+.summary-label-cell {
+    background-color: #ffffff !important;
+    padding-left: 14px !important;
+    border-right: 2px solid #d8dde6;
+}
+
+.team-name-info {
+    font-size: 0.95rem;
+    color: #000000; /* 팀명 완전 검정 */
+    font-weight: 900;
+    margin-bottom: 4px;
+}
+
+.label-row {
+    font-size: 0.75rem;
+    color: #080808; /* 보조 설명글도 검정색으로 */
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+/* 데이터 라인: 회색 글자 제거 */
+.contract-summary-line {
+    font-size: 0.8rem;
+    color: #00396b; /* 계약 정보는 진한 남색 */
+    border-bottom: 1px solid #eef4ff;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+}
+
+.actual-summary-line {
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: #000000; /* 실제 정보는 완전 검정 */
+}
+
+/* 기호 및 인원수 색상 강화 */
+.sep { color: #000000; font-weight: bold; margin: 0 3px; }
+.count { color: #0070d2; font-weight: 700; } /* 인원수는 파란색으로 포인트 */
+.actual-label { color: #0070d2; font-weight: 900; }
+
+/* 구분 너비 조정*/
+.col-label {
+    width: 200px;
+}
+/* 총계 너비 조정*/
+.col-total {
+    width: 150px;
+}
+
+/* 본부 총계 행 (Total Row) */
+.total-row td {
+    background-color: #f0f8ff !important;
+    border-top: 2px solid #0070d2;
+    border-bottom: 2px solid #0070d2;
+}
+
+/* 총계 셀 (반전 영역) 글자 강화 */
+.total-row .grand-total-cell {
+    background-color: #00396b !important;
+    color: #ffffff !important;
+}
+
+.total-row .grand-total-cell span {
+    color: #ffffff !important; /* 모든 내부 글자 강제 흰색 */
+    font-weight: 800;
+}
+
+.total-row .grand-total-cell .contract-summary-line {
+    border-bottom-color: rgba(255,255,255,0.4);
+    padding-bottom: 4px;
+}
+
+/* 팀별 총계 열 강조 */
+.team-grand-total {
+    background-color: #ffffff;
+    border-left: 2px solid #0070d2 !important;
+    font-weight: 800;
+}
+
+/* 가동률 강조용 클래스 */
+.m-aUtil-high { color: #ea001e !important; font-weight: 900; } /* 100% 이상시 빨강 */
+
+/* 애니메이션 */
+.animate-fade-in { animation: fadeIn 0.2s ease-in; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

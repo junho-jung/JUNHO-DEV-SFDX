@@ -1,0 +1,96 @@
+<!--
+- @Author            : jh.jung
+- @Description 		 : 
+- @Target            : 
+- @Modification Log
+- Ver      Date            Author           Modification
+- ===================================================================================
+- 1.0      2026-01-12      jh.jung           Created
+-->
+<!-- Pms Project View Add Member Modal -->
+<template>
+  <lightning-modal-header label={modalHeader}></lightning-modal-header>
+
+  <lightning-modal-body>
+    <div class="slds-grid slds-gutters slds-grid_vertical-align-end">
+      <div class="slds-col slds-size_4-of-12">
+        <lightning-record-picker
+          label="직원 검색(미배정인 경우 TBD로 등록)"
+          placeholder="성명 또는 부서명 입력"
+          object-api-name="Employee__c"
+          value={selectedEmployeeId}
+          display-info={displayInfo}
+          matching-info={matchingInfo}
+          filter={filterInfo}
+          onchange={handleEmployeeChange}>
+        </lightning-record-picker>
+      </div>
+
+      <div class="slds-col slds-size_4-of-12">
+        <lightning-combobox
+          label="역할"
+          name="role"
+          value={selectedRole}
+          placeholder="역할 선택"
+          options={roleOptions}
+          onchange={handleRoleChange}
+          required>
+        </lightning-combobox>
+      </div>
+
+      <div class="slds-col slds-size_4-of-12">
+        <lightning-combobox
+          label="등급"
+          name="grade"
+          value={selectedGrade}
+          placeholder="등급 선택"
+          options={gradeOptions}
+          onchange={handleGradeChange}>
+        </lightning-combobox>
+      </div>
+    </div>
+
+    <template if:true={selectedEmployeeId}>
+      <div class="slds-m-top_large slds-border_top slds-p-top_medium">
+
+        <template lwc:if={isPlaceholderSelected}>
+          <div class="slds-scoped-notification slds-media slds-media_center slds-theme_warning slds-m-top_medium" role="status">
+            <div class="slds-media__figure">
+              <lightning-icon icon-name="utility:info" variant="inverse" size="small"></lightning-icon>
+            </div>
+            <div class="slds-media__body">
+              <p>{placeholderWarningMessage}</p>
+            </div>
+          </div>
+        </template>
+
+        <template lwc:else>
+          <h3 class="slds-text-heading_small slds-m-bottom_small">🔍 현재 투입 현황</h3>
+          <c-pms-team-view-grid
+            allocations={memberAllocations}
+            target-member-id={selectedEmployeeId}
+            hide-team-header="true"
+            current-half="H1">
+          </c-pms-team-view-grid>
+        </template>
+
+      </div>
+    </template>
+
+    <template if:true={isLoading}>
+      <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+  </lightning-modal-body>
+
+  <lightning-modal-footer>
+    <lightning-button label="취소" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      label={actionLabel}
+      variant="brand"
+      icon-name={actionIcon}
+      onclick={handleAction}
+      disabled={isAddDisabled}
+      class="slds-m-left_x-small">
+    </lightning-button>
+  </lightning-modal-footer>
+</template>

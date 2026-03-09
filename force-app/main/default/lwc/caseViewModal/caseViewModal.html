@@ -1,0 +1,157 @@
+<!--
+ * @author : jh.jung
+ * @date : 2024-08-02
+ * @description :
+ * @target :
+==============================================================
+ * Ver          Date            Author          Modification
+ * 1.0          2024-08-02      jh.jung         Initial Version
+-->
+<!-- Case Detail View -->
+<template>
+    <template if:true={isModal}>
+        <div class="modal-div">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                     aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- modal header start -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close"
+                                onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close"
+                                            alternative-text="close"
+                                            variant="inverse"
+                                            size="small">
+                            </lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Maintenance Result Sheet</h2>
+                    </header>
+                    <!-- modal body start -->
+                    <div class="modal-body slds-grid slds-wrap slds-size_1-of-1 slds-modal__content slds-p-around_medium" id="modal-content-id-2" style="justify-content: center; height: 25rem;">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>고객명</th>
+                                <td>{accountName}</td>
+                                <th>점검자</th>
+                                <td>{ownerName}</td>
+                            </tr>
+                            <tr>
+                                <th>모델명</th>
+                                <td>
+                                    <input
+                                      type="text"
+                                      class="hidden-input"
+                                      name="model"
+                                      value={model}
+                                      oninput={handleInputChange}
+                                    /></td>
+                                <th>설치일자</th>
+                                <td>{installationDate}</td>
+                            </tr>
+                            <tr>
+                                <th>System S/N</th>
+                                <td>
+                                    <input
+                                      type="text"
+                                      class="hidden-input"
+                                      name="sn"
+                                      value={sn}
+                                      oninput={handleInputChange}
+                                    /></td>
+                                <th>Warranty</th>
+                                <td>
+                                    <input
+                                      type="text"
+                                      class="hidden-input"
+                                      name="warranty"
+                                      value={warranty}
+                                      oninput={handleInputChange}
+                                    /></td>
+                            </tr>
+                            <tr>
+                                <th>실행일자</th>
+                                <td colspan="3">{createdDate} ~ {closedDate}</td>
+                            </tr>
+                            </thead>
+                        </table>
+                        <table>
+                            <tbody>
+                            <tr>
+                                <th style="width: 12.5%;">Title</th>
+                                <th style="width: 12.5%;">Task</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 12.5%;">Result</th>
+                                <th style="width: 12.5%;">Note</th>
+                            </tr>
+                            <template for:each={itemsWithIndexZero} for:item="data" for:index="index">
+                                <tr key={data}>
+                                    <template if:true={data.isIndexZero}>
+                                        <td rowspan={description.length}>Console Inspection</td>
+                                        <td rowspan={description.length}>Console Visual</td>
+                                    </template>
+                                    <td>
+                                        <input
+                                          type="text"
+                                          class="hidden-input"
+                                          name={data.id}
+                                          key={data.id}
+                                          value={data.item}
+                                          oninput={handleInputListChange}
+                                        />
+                                    </td>
+                                    <td class="center">
+                                        <input type="radio" name={data.id} value="Pass"> Pass &nbsp;&nbsp;
+                                        <input type="radio" name={data.id} value="Fail"> Fail
+                                    </td>
+                                    <td>
+                                        <input
+                                          type="text"
+                                          class="hidden-input"
+                                          name={data.id}
+                                          key={data.id}
+                                          value={data.item}
+                                          oninput={handleInputListChange}
+                                        />
+                                    </td>
+                                </tr>
+                            </template>
+                            <tr>
+                                <th>기타 의견</th>
+                                <td colspan="4">
+                                    <textarea
+                                      class="hidden-input"
+                                      name="others"
+                                      value={others}
+                                      oninput= {handleInputChange}
+                                      style= "height: 6vw;"
+                                    >{others}</textarea>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table>
+                            <tfoot>
+                            <tr>
+                                <th style="width: 12.5%;">고객확인</th>
+                                <td style="width: 25%;">부서명 : </td>
+                                <td style="width: 25%;">직책:</td>
+                                <td style="width: 25%;">성명:</td>
+                                <td style="width: 12.5%;">(확인)</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <!-- modal footer start -->
+                    <footer class="slds-modal__footer">
+                        <button class="btn slds-button slds-button_neutral" label="닫기" onclick={closeModal}>닫기</button>
+                        <button class="btn slds-button slds-button_neutral" label="수정 반영" onclick={doSave}>수정 반영</button>
+                    </footer>
+                </div>
+            </section>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    <!-- modal [E] -->
+</template>

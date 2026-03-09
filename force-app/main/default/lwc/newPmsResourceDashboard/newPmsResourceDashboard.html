@@ -1,0 +1,96 @@
+<!--
+- @Author            : jh.jung
+- @Description 		 : 
+- @Target            : 
+- @Modification Log
+- Ver      Date            Author           Modification
+- ===================================================================================
+- 1.0      2025-12-29      jh.jung           Created
+-->
+<!-- New Pms Resource Dashboard -->
+<template>
+  <lightning-card title="M/M 가동률 관리 시스템" icon-name="standard:rtc_presence">
+    <lightning-tabset variant="scoped" active-tab-value={viewMode}>
+      <lightning-tab label="팀별 뷰" value="team" onactive={handleTabActive}></lightning-tab>
+      <lightning-tab label="프로젝트별 뷰" value="project" onactive={handleTabActive}></lightning-tab>
+    </lightning-tabset>
+
+    <div class="slds-container_fluid slds-p-around_medium slds-border_right slds-border_left slds-border_bottom" style="background: white; margin-top: -1px; min-height: 600px;">
+      <div class="slds-grid slds-grid_vertical-align-end slds-grid_align-spread slds-m-bottom_large">
+        <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+          <lightning-combobox label="연도" value={selectedYear} options={yearOptions} onchange={handleFilterChange} data-name="year"></lightning-combobox>
+        </div>
+        <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+          <lightning-combobox label="사업부" value={selectedDivision} options={divisionOptions} onchange={handleFilterChange} data-name="division"></lightning-combobox>
+        </div>
+
+        <template lwc:if={isTeamView}>
+          <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+            <lightning-combobox label="팀" value={selectedTeam} options={teamOptions} onchange={handleFilterChange} data-name="team"></lightning-combobox>
+          </div>
+        </template>
+        <template lwc:if={isProjectView}>
+          <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+            <lightning-button-menu label={projectLabel} onselect={handleProjectSelect} variant="border-filled">
+              <template for:each={projectOptions} for:item="opt">
+                <lightning-menu-item key={opt.value} label={opt.label} value={opt.value} checked={opt.checked}></lightning-menu-item>
+              </template>
+            </lightning-button-menu>
+          </div>
+        </template>
+
+        <div class="slds-col slds-size_1-of-8 slds-m-right_small">
+<!--          <lightning-radio-group label="기간" value={selectedHalf} options={halfOptions} onchange={handleFilterChange} data-name="half" type="button"></lightning-radio-group>-->
+        </div>
+
+        <template lwc:if={isTeamView}>
+          <div class="slds-col slds-m-right_none slds-size_3-of-8">
+            <div class="slds-grid slds-grid_align-spread slds-p-bottom_xx-small">
+              <span class="slds-text-title_bold">{selectedYear} {selectedTeam} 평균 가동률: {totalUtilization}%</span>
+            </div>
+            <div class="slds-progress-bar slds-progress-bar_medium" role="progressbar">
+              <span class="slds-progress-bar__value" style={totalProgressStyle}></span>
+            </div>
+          </div>
+        </template>
+
+        <template lwc:if={isProjectView}>
+          <div class="slds-col slds-button__icon_right slds-size_3-of-8">
+            <lightning-button-group>
+              <lightning-button label="조회" variant={viewModeVariant} icon-name="utility:preview" onclick={handleModeChange} data-mode="read"></lightning-button>
+              <lightning-button label="편집" variant={editModeVariant} icon-name="utility:edit" onclick={handleModeChange} data-mode="edit"></lightning-button>
+            </lightning-button-group>
+          </div>
+        </template>
+      </div>
+
+      <div class="grid-container slds-is-relative">
+        <template lwc:if={isLoading}>
+          <lightning-spinner alt="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <c-new-pms-team-view-grid
+          lwc:if={isTeamView}
+          allocations={originalData}
+          current-half={selectedHalf}
+        ></c-new-pms-team-view-grid>
+
+        <c-new-pms-project-view-grid
+          lwc:if={isProjectView}
+          allocations={originalData}
+          current-half={selectedHalf}
+          is-read-only={isReadOnlyMode}
+          draft-values={draftValues}
+          ongridaction={handleGridAction}
+        ></c-new-pms-project-view-grid>
+      </div>
+    </div>
+
+    <div slot="actions">
+      <template lwc:if={showEditActions}>
+        <lightning-button label="취소" onclick={handleCancel} class="slds-m-right_x-small"></lightning-button>
+        <lightning-button label="전체 저장" variant="brand" onclick={handleSave}></lightning-button>
+      </template>
+    </div>
+  </lightning-card>
+</template>

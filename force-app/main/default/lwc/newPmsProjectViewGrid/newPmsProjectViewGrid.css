@@ -1,0 +1,81 @@
+/*************************************************************
+ * @author : jh.jung
+ * @date : 2025-12-29
+ * @description : 
+ * @target : 
+==============================================================
+ * Ver          Date            Author          Modification
+ * 1.0          2025-12-29      jh.jung         Initial Version
+**************************************************************/
+
+/* 테이블 레이아웃 고정: 너비가 변하지 않도록 설정 */
+.custom-allocation-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* 성명 열 고정 */
+.member-info-col {
+    width: 220px;
+    white-space: normal;
+}
+
+/* 월별 공수 열 너비 고정 (x.y 형태에 최적화) */
+.mm-header-col {
+    width: 100px; /* 100px 정도로 고정하면 x.y / x.y를 담기에 충분합니다 */
+}
+
+/* 모든 셀의 높이를 동일하게 유지 */
+.allocation-cell {
+    height: 45px; /* 조회/편집 모드 모두 이 높이를 유지 */
+    vertical-align: middle;
+}
+
+/* 조회 모드 박스: 편집 모드 input과 동일한 공간 확보 */
+.read-only-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 0.85rem;
+}
+
+/* 편집 모드 래퍼: input들이 튀어나가지 않게 관리 */
+.edit-input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 4px;
+}
+
+/* 공수 입력 필드 스타일 고정 */
+.mm-input-field {
+    width: 38px; /* x.y 입력에 딱 맞는 고정 너비 */
+    height: 24px;
+    border: 1px solid #d8dde6;
+    border-radius: 3px;
+    text-align: center;
+    font-size: 0.8rem;
+    padding: 0;
+}
+
+/* 실제 공수 입력 필드 강조 */
+.actual-focus {
+    border-color: #1589ee;
+    font-weight: bold;
+}
+
+.mm-separator {
+    margin: 0 2px;
+    color: #aeaeae;
+    font-size: 0.75rem;
+}
+
+.dirty-indicator {
+    color: #ea001e;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 1rem;
+}

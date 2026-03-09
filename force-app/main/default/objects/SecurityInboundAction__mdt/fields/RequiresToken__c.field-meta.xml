@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RequiresToken__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>true면 서명 토큰+만료시간(t) 검증 필수. 팀즈 링크 클릭 등에 사용.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Requires Token</label>
+    <type>Checkbox</type>
+</CustomField>

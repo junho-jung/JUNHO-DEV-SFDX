@@ -1,0 +1,67 @@
+/*************************************************************
+ * @author : jh.jung
+ * @date : 2024-08-05
+ * @description :
+ * @target :
+==============================================================
+ * Ver          Date            Author          Modification
+ * 1.0          2024-08-05      jh.jung         Initial Version
+**************************************************************/
+
+.margin {
+    margin-left: 1em;
+}
+
+.container {
+    justify-content: center;
+    height: 100%;
+}
+
+.content-header {
+    width: 100%;
+    margin-bottom: 2em;
+}
+.content-header .title {
+    text-align: center;
+}
+.content-header .header-button {
+    text-align: right;
+}
+.content-body {
+    width: 100%;
+    margin-bottom: 2em;
+}
+
+table {
+    width: 100%; /* 테이블 너비를 모달 내부 너비에 맞춤 */
+    border-collapse: collapse; /* 셀 테두리 병합 */
+    table-layout: fixed;
+    margin: 0;
+    padding: 0;
+}
+table thead th, table thead td {
+    width: 25%;
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+table th {
+    border: 1px solid #ddd;
+    background-color: #f2f2f2; /* 헤더 배경색 */
+    text-align: left;
+    padding: 10px;
+}
+table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.hidden-input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    box-shadow: none;
+    outline: none;
+}
+.hidden-input:focus {
+    outline: none;
+}

@@ -1,0 +1,85 @@
+<!--
+- @Author            : jh.jung
+- @Description 		 : 
+- @Target            : 
+- @Modification Log
+- Ver      Date            Author           Modification
+- ===================================================================================
+- 1.0      2026-01-14      jh.jung           Created
+-->
+<!-- Pms Team View Grid Roll Up -->
+<template>
+  <div class="slds-p-around_medium">
+    <template for:each={formattedData} for:item="team">
+      <div key={team.id} class="slds-m-bottom_large slds-p-left_medium">
+        <div class="slds-section__title slds-theme_shade slds-p-around_x-small team-header">
+          <strong>👥 {team.name}</strong>
+        </div>
+
+        <table class="slds-table slds-table_bordered slds-table_col-bordered">
+          <thead>
+          <tr>
+            <th style="width: 250px;">성명 (역할)</th>
+            <template for:each={monthLabels} for:item="label">
+              <th key={label} class="slds-text-align_center">{label}</th>
+            </template>
+          </tr>
+          </thead>
+          <tbody>
+          <template for:each={team.memberList} for:item="member">
+            <tr key={member.id}>
+              <td class="sticky-col"><strong>{member.name}</strong><br/><span class="slds-text-body_small">{member.role}</span></td>
+              <template for:each={member.monthlyData} for:item="total">
+                <td key={total.month}
+                    class={total.cellClass}
+                    onclick={handleCellClick}
+                    data-member-id={member.id}
+                    data-member-name={member.name}
+                    data-month={total.month}>
+                  {total.contract} / {total.actual}
+                </td>
+                <!--                <td key={total.month}-->
+                <!--                    data-month={total.month}>-->
+                <!--                  {total.contract} / {total.actual}-->
+                <!--                </td>-->
+              </template>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+
+    <template if:true={isModalOpen}>
+      <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+              <lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+            </button>
+            <h2 class="slds-text-heading_medium">{selectedMemberName} - {selectedMonth}월 상세</h2>
+          </header>
+
+          <div class="slds-modal__content slds-p-around_medium">
+            <template for:each={modalData} for:item="item">
+              <div key={item.projectId} class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small slds-box slds-box_xx-small">
+                <div class="slds-col slds-size_2-of-3">
+                  <strong>{item.ProjectName}</strong>
+                  <div class="slds-text-body_small">{item.Role}</div>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                  {item.contract} / {item.actual}
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <footer class="slds-modal__footer">
+            <lightning-button label="닫기" variant="brand" onclick={closeModal}></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open" onclick={closeModal}></div>
+    </template>
+  </div>
+</template>

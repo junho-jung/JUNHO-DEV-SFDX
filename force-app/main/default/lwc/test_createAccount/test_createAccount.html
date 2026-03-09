@@ -1,0 +1,65 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                <span class="slds-icon_container slds-icon-standard-account" title="account">
+                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                        <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#account"></use>
+                    </svg>
+                    <span class="slds-assistive-text">account</span>
+                </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <a href="#" class="slds-card__header-link slds-truncate" title="Accounts">
+                        <span>연락처</span>
+                        </a>
+                    </h2>
+                </div>
+                <div class="slds-no-flex">
+                    <button class="slds-button slds-button_neutral" onclick={reverseinputFormFlag}>연락처 생성</button>
+                    <!-- modal start -->
+                    <article if:true={inputFormFlag}>
+                        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+                            <div class="slds-modal__container">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+                                <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                                </svg>
+                        <span class="slds-assistive-text">Cancel and close</span>
+                            </button>
+                            <div class="slds-modal__header">
+                                <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">연락처 추가</h1>
+                            </div>
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <lightning-record-edit-form
+                                    object-api-name="Contact"
+                                >
+                                    <lightning-input-field field-name="AccountId" onchange={changeCheck}></lightning-input-field>
+                                    <lightning-input-field field-name="FirstName" onchange={changeCheck}></lightning-input-field>
+                                    <lightning-input-field field-name="LastName" onchange={changeCheck}></lightning-input-field>
+                                    <lightning-input-field field-name="Email" onchange={changeCheck}></lightning-input-field>
+                                </lightning-record-edit-form>
+                            </div>
+                            <div class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={reverseinputFormFlag}>Cancel</button>
+                                <button class="slds-button slds-button_brand" onclick={saveContactClick}>Save</button>
+                            </div>
+                            </div>
+                        </section>
+                        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+                    </article>
+                    <!-- modal end -->
+                </div>
+            </header>
+        </div>
+        <div style="height: 300px;">
+            <lightning-datatable
+                    key-field="id"
+                    data={data} 
+                    columns={columns}>
+            </lightning-datatable>
+        </div>
+    </article>
+</template>

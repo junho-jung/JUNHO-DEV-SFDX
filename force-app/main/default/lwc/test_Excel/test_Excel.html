@@ -1,0 +1,56 @@
+<template>
+    <lightning-card>
+        <lightning-input type="toggle" label="Show Default Table" onchange={showDefaultData} checked={isShowDefaultData}></lightning-input>
+        <lightning-button variant="brand-outline" label="Excel Download" title="Primary action with lighter look" onclick={excelDownload} class="slds-m-left_x-small"></lightning-button>
+        <lightning-button variant="brand-outline" label="Excel Upload" title="Primary action with lighter look" onclick={isUploadModal} class="slds-m-left_x-small"></lightning-button>
+    
+        <div class="excel-table"></div>
+        <!-- <div id="excel-table"></div> -->
+        
+        <!--
+        <table>
+            <template for:each={showdata} for:item="dataRecord">
+                <tr key={dataRecord.size}>
+                    <template for:each={dataRecord} for:item="data">
+                        <td key={data.length}>{data}</td>
+                    </template>
+                </tr>
+            </template>
+        </table>
+        -->
+
+        <!-- 파일 업로드 모달​ -->
+        <template if:true={isShowUploadModal}> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">​
+                <div class="slds-modal__container">​
+                    <!-- modal header start -->​
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal close slds-button_icon-inverse" title="Close" onclick={isUploadModal}>​
+                            <lightning-icon icon-name="utility:close"
+                                            alternative-text="close"
+                                            variant="inverse"
+                                            size="small">​
+                            </lightning-icon>​
+                            <span class="slds-assistive-text">Close</span>
+                        </button>​
+                        <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Select excelfile to upload</h2>​
+                    </header>​
+                    <!-- modal body start -->​
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2" style="justify-content: center;">​
+                        <h2 style="font-weight: bolder; font-size: 20px;">파일명</h2>​
+                        <div style="display:inline-block;"><p>fileName</p></div>​
+                        <div class="slds-p-bottom_large slds-p-left_large" style="float: right;">​
+                            <lightning-input class="file-Input" type="file" accept=".xlsx" slot="actions" onchange={excelFileLoad}></lightning-input>​
+                        </div>​
+                    </div>​
+                    <!-- modal footer start -->​
+                    <footer class="slds-modal__footer">​
+                        <button class="slds-button slds-button_neutral" onclick={refreshTable}>Upload File</button>​
+                        <button class="slds-button slds-button_neutral" onclick={isUploadModal}>Close</button>​
+                    </footer>​
+                </div>​
+            </section>​
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </lightning-card>
+</template>

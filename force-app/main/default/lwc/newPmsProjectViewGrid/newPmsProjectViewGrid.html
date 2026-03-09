@@ -1,0 +1,89 @@
+<!--
+- @Author            : jh.jung
+- @Description 		 : 
+- @Target            : 
+- @Modification Log
+- Ver      Date            Author           Modification
+- ===================================================================================
+- 1.0      2025-12-29      jh.jung           Created
+-->
+<!-- New Pms Project View Grid -->
+<template>
+  <div class="project-view-container">
+    <template for:each={formattedData} for:item="project">
+      <div key={project.id} class="project-card slds-m-bottom_large">
+
+        <div class="slds-page-header slds-theme_shade project-header-bg">
+          <span class="slds-text-heading_small">📂 {project.name}</span>
+        </div>
+
+        <table class="slds-table slds-table_bordered slds-table_col-bordered custom-allocation-table">
+          <thead>
+          <tr>
+            <th class="member-info-col">성명 (역할/팀)</th>
+            <template for:each={monthLabels} for:item="label">
+              <th key={label} class="slds-text-align_center mm-header-col">{label}</th>
+            </template>
+          </tr>
+          </thead>
+          <tbody>
+          <template for:each={project.memberList} for:item="member">
+            <tr key={member.id}>
+              <td class="member-cell slds-cell-wrap">
+                <strong>{member.name}</strong><br/>
+                <span class="slds-text-body_small">{member.role} | {member.team}</span>
+              </td>
+
+              <template for:each={member.cells} for:item="cell">
+                <td key={cell.month} class="slds-p-around_none allocation-cell slds-is-relative">
+
+                  <template lwc:if={isReadOnly}>
+                    <div class="read-only-display">
+                      <span>{cell.contract}</span>
+                      <span class="mm-separator">/</span>
+                      <span class="actual-value-bold">{cell.actual}</span>
+                    </div>
+                  </template>
+
+                  <template lwc:else>
+                    <div class="edit-input-wrapper">
+                      <input type="number" step="0.1" value={cell.contract}
+                             oninput={handleInputChange} data-key={cell.compositeKey} data-type="contract"
+                             class="mm-input-field">
+                      <span class="mm-separator">/</span>
+                      <input type="number" step="0.1" value={cell.actual}
+                             oninput={handleInputChange} data-key={cell.compositeKey} data-type="actual"
+                             class="mm-input-field actual-focus">
+
+                      <template if:true={cell.isDirty}>
+                        <span class="dirty-indicator">*</span>
+                      </template>
+                    </div>
+                  </template>
+                </td>
+              </template>
+            </tr>
+          </template>
+          </tbody>
+
+          <tfoot class="project-summary-footer">
+          <tr class="slds-theme_shade">
+            <td class="slds-text-align_left">
+              <strong>소계</strong>
+            </td>
+            <template for:each={project.monthlyTotals} for:item="total">
+              <td key={total.month} class="slds-text-align_center">
+                <div class="total-display-value">
+                  <span class="total-contract">{total.contractTotal}</span>
+                  <span class="mm-separator">/</span>
+                  <span class="total-actual-bold">{total.actualTotal}</span>
+                </div>
+              </td>
+            </template>
+          </tr>
+          </tfoot>
+        </table>
+      </div>
+    </template>
+  </div>
+</template>

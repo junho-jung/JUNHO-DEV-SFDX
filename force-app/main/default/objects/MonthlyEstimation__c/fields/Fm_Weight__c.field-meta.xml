@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Fm_Weight__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+TEXT(ProjectMember__r.Opportunity__r.StageName) = &quot;Closed Won&quot;,
+1,
+CASE(
+ProjectMember__r.Opportunity__r.Probability__c,
+&quot;상&quot;, 0.75,
+&quot;중&quot;, 0.5,
+&quot;하&quot;, 0.25,
+0
+)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Fm_Weight</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

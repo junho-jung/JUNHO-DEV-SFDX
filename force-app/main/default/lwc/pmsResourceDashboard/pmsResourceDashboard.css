@@ -1,0 +1,23 @@
+/*************************************************************
+ * @author : jh.jung
+ * @date : 2026-01-06
+ * @description :
+ * @target :
+==============================================================
+ * Ver          Date            Author          Modification
+ * 1.0          2026-01-06      jh.jung         Initial Version
+**************************************************************/
+
+/* 탭 내부 콘텐츠가 시작되는 부분의 기본 여백 제거 */
+:host {
+    --slds-c-tabs-scoped-color-background: white;
+    --slds-c-tabs-scoped-spacing-block-start: 0;
+    --slds-c-tabs-scoped-spacing-block-end: 0;
+}
+
+/* 탭 바와 아래 콘텐츠 사이의 미세한 공백 제거 */
+.slds-tabs_scoped__content {
+    padding: 0 !important;
+    margin: 0 !important;
+    border-top: none !important;
+}

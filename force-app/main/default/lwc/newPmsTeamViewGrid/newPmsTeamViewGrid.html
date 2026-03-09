@@ -1,0 +1,68 @@
+<!--
+- @Author            : jh.jung
+- @Description 		 : 
+- @Target            : 
+- @Modification Log
+- Ver      Date            Author           Modification
+- ===================================================================================
+- 1.0      2025-12-29      jh.jung           Created
+-->
+<!-- New Pms Team View Grid -->
+<template>
+  <div class="slds-p-around_medium">
+    <template for:each={formattedData} for:item="team">
+      <div key={team.id} class="slds-m-bottom_large">
+        <div class="team-header slds-p-around_x-small">
+          <strong>👥 {team.name}</strong>
+        </div>
+
+        <div class="slds-scrollable_x">
+          <table class="team-table slds-table slds-table_bordered slds-table_col-bordered">
+            <thead>
+            <tr>
+              <th class="col-name">성명 (역할)</th>
+              <th class="col-proj">참여 프로젝트</th>
+              <template for:each={monthLabels} for:item="label">
+                <th key={label} class="slds-text-align_center col-mm">{label}</th>
+              </template>
+            </tr>
+            </thead>
+            <tbody>
+            <template for:each={team.memberList} for:item="member">
+              <tr key={member.id}>
+                <td class="cell-name">
+                  <strong>{member.name}</strong><br/>
+                  <span class="role-text">{member.role}</span>
+                </td>
+
+                <td class="cell-proj">
+                  <template for:each={member.projectList} for:item="p">
+                    <div key={p.id} class="project-name-label">• {p.name}</div>
+                  </template>
+                </td>
+
+                <template for:each={member.monthlyData} for:item="month">
+                  <td key={month.month} class={month.cellClass}>
+                    <div class="detail-rows">
+                      <template for:each={month.projects} for:item="pj">
+                        <div key={pj.id} class="detail-val">
+                          <template if:true={pj.isMM}>
+                            {pj.contract} / {pj.actual}
+                          </template>
+                          <template if:false={pj.isMM}>
+                            &nbsp;
+                          </template>
+                        </div>
+                      </template>
+                    </div>
+                  </td>
+                </template>
+              </tr>
+            </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </template>
+  </div>
+</template>

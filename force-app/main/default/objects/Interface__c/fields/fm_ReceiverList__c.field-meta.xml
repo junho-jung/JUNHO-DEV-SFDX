@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>fm_ReceiverList__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISBLANK(EmailReceiver1__c), &apos;&apos;, EmailReceiver1__c + &apos;;&apos;)
++ IF(ISBLANK(EmailReceiver2__c), &apos;&apos;, EmailReceiver2__c + &apos;;&apos;)
++ IF(ISBLANK(EmailReceiver3__c), &apos;&apos;, EmailReceiver3__c + &apos;;&apos;)
++ IF(ISBLANK(EmailReceiver4__c), &apos;&apos;, EmailReceiver4__c + &apos;;&apos;)
++ IF(ISBLANK(EmailReceiver5__c), &apos;&apos;, EmailReceiver5__c + &apos;;&apos;)
++ IF(ISBLANK(EmailReceiver6__c), &apos;&apos;, EmailReceiver6__c + &apos;;&apos;)
++ IF(ISBLANK(EmailReceiver7__c), &apos;&apos;, EmailReceiver7__c + &apos;;&apos;)
++ IF(ISBLANK(EmailReceiver8__c), &apos;&apos;, EmailReceiver8__c + &apos;;&apos;)
++ IF(ISBLANK(EmailReceiver9__c), &apos;&apos;, EmailReceiver9__c + &apos;;&apos;)
++ IF(ISBLANK(EmailReceiver10__c), &apos;&apos;, EmailReceiver10__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>fm_ReceiverList</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

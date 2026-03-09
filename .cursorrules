@@ -1,0 +1,42 @@
+# 🎯 프로젝트 컨텍스트 (Project Context)
+- **구조:** 이 프로젝트는 Salesforce Metadata API (Classic) 구조를 사용합니다.
+- **소스 경로:** - 모든 소스 코드는 반드시 `src/` 폴더 내에 위치해야 합니다.
+  - Apex 클래스: `src/classes/` (반드시 `.cls-meta.xml` 파일과 세트로 생성)
+  - LWC 컴포넌트: `src/lwc/` (js, html, js-meta.xml 필수 포함)
+  - 트리거: `src/triggers/` (반드시 `.trigger-meta.xml` 파일과 세트로 생성)
+- **금지 사항:** 절대로 `force-app/` 구조를 생성하지 마세요. 이는 Illuminated Cloud 환경을 파괴합니다.
+
+# ☁️ 세일즈포스 개발 가이드 (Salesforce Development)
+- **오그 별칭:** JUNHO-DEV (또는 `sf config` 타겟 오그)
+- **메타데이터 동기화 (CRITICAL):**
+  - **신규 파일 생성 시:** 반드시 해당 소스의 메타데이터 파일(`-meta.xml`)을 함께 생성하세요. (예: `MyClass.cls` 생성 시 `MyClass.cls-meta.xml` 필수 생성)
+  - **package.xml 업데이트:** 새 파일 추가 시 `src/package.xml`에 추가할 `<members>` 노드 코드를 즉시 제안하세요.
+- **조회 작업:** `Salesforce MCP`를 통해 실제 오그의 스키마와 Custom Metadata Type 레코드를 조회하여 로직에 반영하세요. 단, 오그에 직접 배포/수정 명령은 내리지 않습니다.
+
+# ✅ 밸리데이션 레이어 (Validation Layer)
+1. **Apex 정적 분석:** - CRUD/FLS 체크(`with USER_MODE` 또는 `Security.stripInaccessible`) 누락 여부를 검사하세요.
+   - SOQL 쿼리에 `WHERE` 절과 `LIMIT`이 있는지, Loop 내 DML이 없는지(Bulkification) 전수 검사하세요.
+2. **LWC JS 정밀 검수:** - 인텔리제이 에디션 문제로 인한 문법 오류를 방지하기 위해, LWC 데코레이터(`@api`, `@wire`, `@track`)와 임포트 구문이 최신 Salesforce 표준에 맞는지 이중 검토하세요.
+3. **로직 추적:** 복잡한 로직 작성 전, 예상되는 실행 흐름(Logic Trace)을 먼저 설명하여 사용자 확답을 받은 후 코딩을 시작하세요.
+4. **테스트 보장:** 수정 시 75% 이상의 커버리지를 위한 Test Class 생성을 기본으로 제안하세요.
+
+# 🌿 버전 관리 및 Git 전략
+- **Git MCP 활용:** `git diff`를 통해 수정 사항의 영향도를 평가하고 요약 보고서를 작성하세요.
+- **커밋 가이드:** `[Sync]`, `[Feat]`, `[Fix]`, `[Refactor]` 접두사를 사용하세요.
+- **확인 절차:** 작업 완료 후 "Git MCP로 스테이징 및 커밋을 진행하시겠습니까?"라고 먼저 확인하세요.
+
+# 🤖 AI 바이브 코딩 수칙
+1. **보안 지킴이:** 하드코딩된 Org ID, API Key 등을 상시 감시하고 발견 시 즉시 경고하세요.
+2. **워크플로우 가이드 (필수 출력):** 작업 완료 시 항상 아래의 **[Next Step]**을 순서대로 안내하세요.
+   - "1. 생성된 `-meta.xml` 파일과 `src/` 내 소스 코드를 확인하세요."
+   - "2. 인텔리제이(Illuminated Cloud)에서 해당 파일들을 Deploy 하세요."
+   - "3. 서버 반영 확인 후, Git MCP로 커밋 및 푸시를 진행하세요."
+
+# 🛠️ MCP 도구 사용 설정
+- `Salesforce MCP`: 별도 인자 없으면 `DEFAULT_TARGET_ORG` 사용.
+- `Git MCP`: 항상 작업 디렉토리 루트(`.`) 기준 작동.
+
+# ⚠️ Apex Syntax Guard (Anti-Patterns)
+- **Inner Class Restriction:** Apex의 Inner Class 내에서는 `static` 키워드(변수, 메서드)를 사용할 수 없음을 엄격히 준수하세요. 모든 static 멤버는 Top-level 클래스로 이동시키거나 별도의 유틸리티 클래스로 분리하세요.
+- **SOQL in Loops:** 변수 할당문이나 조건문 안에서도 SOQL이 Loop 내에 위치하지 않도록 철저히 감시하세요.
+- **Access Modifiers:** 클래스 생성 시 기본 접근 제어자는 `with sharing`을 원칙으로 하되, 비즈니스 로직에 따라 명확히 지정하세요.

@@ -1,0 +1,180 @@
+<!--
+ - Created by blacktick on 26. 2. 26..
+ -->
+
+<apex:page lightningStyleSheets="true"
+           showHeader="false"
+           sidebar="false"
+           controller="CustomRichTextController">
+    <apex:slds />
+
+    <apex:form id="theForm">
+
+        <!-- 저장 버튼만 -->
+        <!-- <div class="slds-m-top_small slds-text-align_right">
+          <button type="button"
+                  class="slds-button slds-button_brand"
+                  onclick="saveEditorValue()">
+            저장
+          </button>
+        </div> -->
+
+        <!-- Rich Text Editor -->
+        <apex:inputTextarea id="richText" richText="true"/>
+
+        <!-- [DEPRECATED] VF 내부 저장 버튼용 Apex 호출. LWC postMessage 방식(saveRichText)으로 대체됨. -->
+        <!-- <apex:actionFunction name="doSave"
+                             action="{!save}"
+                             rerender="none"
+                             oncomplete="afterSave('{!JSENCODE(saveResult)}')">
+          <apex:param name="html" value="" assignTo="{!richTextHtml}"/>
+        </apex:actionFunction> -->
+
+    </apex:form>
+
+    <!-- [DEPRECATED] VF 내부 Toast UI. LWC ShowToastEvent로 대체됨. -->
+    <!-- <div id="vfToastWrap"
+         class="slds-notify_container"
+         style="display:none; position:fixed; top:1rem; right:1rem; z-index:999999;">
+      <div id="vfToast"
+           class="slds-notify slds-notify_toast slds-theme_success"
+           role="status" aria-live="polite">
+        <span class="slds-assistive-text">알림</span>
+
+        <div class="slds-notify__content">
+          <h2 id="vfToastMsg" class="slds-text-heading_small"></h2>
+        </div>
+
+        <div class="slds-notify__close">
+          <button type="button"
+                  class="slds-button slds-button_icon slds-button_icon-inverse"
+                  onclick="hideToast()"
+                  title="닫기"
+                  aria-label="닫기">
+            ✕
+          </button>
+        </div>
+      </div>
+    </div> -->
+
+    <style>
+        .cke_contents { height: 330px !important; }
+    </style>
+
+    <script>
+        function findEditorInstance() {
+          try {
+            const ta = document.querySelector('textarea[id$="richText"]');
+            const id = ta ? ta.id : null;
+            if (id && window.CKEDITOR && CKEDITOR.instances && CKEDITOR.instances[id]) {
+              return CKEDITOR.instances[id];
+            }
+          } catch (e) {}
+          if (window.CKEDITOR && CKEDITOR.instances) {
+            for (const k in CKEDITOR.instances) return CKEDITOR.instances[k];
+          }
+          return null;
+        }
+
+        function getEditorHtml() {
+          const ed = findEditorInstance();
+          if (ed) return ed.getData();
+
+          const ta = document.querySelector('textarea[id$="richText"]');
+          return ta ? ta.value : '';
+        }
+
+        // [DEPRECATED] VF 내부 저장 버튼용 함수들. LWC postMessage 방식(saveRichText)으로 대체됨.
+        // function saveEditorValue() {
+        //   const html = getEditorHtml();
+        //   console.log('=== Saving RichText HTML ===');
+        //   console.log(html);
+        //   console.log('length:', (html || '').length);
+        //   console.log('has <table>:', /<table[\s>]/i.test(html));
+        //   doSave(html);
+        // }
+
+        // [DEPRECATED] VF 내부 Toast 함수들. LWC ShowToastEvent로 대체됨.
+        // let __toastTimer;
+        //
+        // function showToast(message, variant) {
+        //   const wrap = document.getElementById('vfToastWrap');
+        //   const toast = document.getElementById('vfToast');
+        //   const msg = document.getElementById('vfToastMsg');
+        //   if (!wrap || !toast || !msg) return;
+        //
+        //   toast.classList.remove('slds-theme_success','slds-theme_error','slds-theme_warning','slds-theme_info');
+        //
+        //   const theme = {
+        //     success: 'slds-theme_success',
+        //     error: 'slds-theme_error',
+        //     warning: 'slds-theme_warning',
+        //     info: 'slds-theme_info'
+        //   }[variant] || 'slds-theme_success';
+        //
+        //   toast.classList.add(theme);
+        //   msg.textContent = message || '';
+        //
+        //   wrap.style.display = 'block';
+        //
+        //   clearTimeout(__toastTimer);
+        //   __toastTimer = setTimeout(hideToast, 2500);
+        // }
+        //
+        // function hideToast() {
+        //   const wrap = document.getElementById('vfToastWrap');
+        //   if (wrap) wrap.style.display = 'none';
+        // }
+        //
+        // function afterSave(resultMsg) {
+        //   console.log('save result:', resultMsg);
+        //
+        //   const s = (resultMsg || '').trim();
+        //   const isError = /^ERROR\s*:/i.test(s);
+        //   const isOk = /^OK\s*:/i.test(s);
+        //
+        //   // "OK:" / "ERROR:" 접두어 제거해서 메시지 깔끔하게
+        //   const pretty = s.replace(/^(OK|ERROR)\s*:\s*/i, '') || (isError ? '저장 실패' : '저장 완료');
+        //
+        //   showToast(pretty, isError ? 'error' : (isOk ? 'success' : 'info'));
+        // }
+
+        // =========================================================
+        // ✅ postMessage 리스너: 부모 LWC에서 에디터 HTML 요청 수신
+        // =========================================================
+        window.addEventListener('message', function(event) {
+          var data = event.data;
+          if (!data || typeof data !== 'object') return;
+
+          if (data.type === 'REQUEST_EDITOR_HTML') {
+            var html = getEditorHtml();
+            parent.postMessage({
+              type: 'RESPONSE_EDITOR_HTML',
+              requestId: data.requestId,
+              html: html
+            }, event.origin);
+          }
+        });
+
+        // ✅ 폴링 없이 instanceReady에서만 초기값 세팅
+        (function initDefaultValue() {
+          const defaultHtml = '{!JSENCODE(richTextHtml)}';
+      const ed = findEditorInstance();
+      if (!ed) return;
+
+      const applyOnce = function() {
+        if (defaultHtml) {
+          ed.setData(defaultHtml);
+        }
+        console.log('=== Default RichText Applied ===');
+        console.log(defaultHtml);
+      };
+
+      if (ed.status === 'ready') {
+        applyOnce();
+      } else {
+        ed.on('instanceReady', applyOnce);
+      }
+    })();
+    </script>
+</apex:page>

@@ -1,0 +1,70 @@
+<template>
+    <lightning-card title="🛡️ SOAR 실시간 보안 관제" icon-name="standard:service_territory_policy">
+        <!-- Action Toolbar -->
+        <div slot="actions">
+            <lightning-button label="새로고침" icon-name="utility:refresh" onclick={handleRefresh}></lightning-button>
+        </div>
+        
+        <div class="slds-p-around_medium">
+            <!-- Alert Display -->
+            <template if:true={error}>
+                <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_medium" role="alert">
+                    <h2>{error}</h2>
+                </div>
+            </template>
+
+            <!-- Loading State -->
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+
+            <lightning-tabset>
+                <!-- 탭 1: 감지 목록 (Audit 기반) -->
+                <lightning-tab label="감지 목록" value="audit">
+                    <template if:true={hasAuditLogs}>
+                        <div class="table-container slds-scrollable_y slds-m-top_small" style="max-height: 500px;">
+                            <lightning-datatable
+                                key-field="Id"
+                                data={auditLogs}
+                                columns={columns}
+                                onrowaction={handleRowAction}
+                                hide-checkbox-column="true">
+                            </lightning-datatable>
+                        </div>
+                    </template>
+                    <template if:false={hasAuditLogs}>
+                        <template if:true={dataLoaded}>
+                            <div class="slds-text-color_weak slds-p-around_medium">
+                                <p>표시할 TSP 감지 로그가 없습니다.</p>
+                                <p class="slds-m-top_x-small">이 화면에는 <b>TSP로 감지된 위협</b>만 표시됩니다. 수동/인바운드 조치로만 생성된 건은 제외됩니다.</p>
+                                <p class="slds-m-top_x-small">데모 시뮬레이터(SOAR Demo)에서 <b>모의 이벤트</b>를 실행하거나, TSP 탐지가 발생하면 여기에 표시됩니다.</p>
+                            </div>
+                        </template>
+                    </template>
+                </lightning-tab>
+
+                <!-- 탭 2: 액션 목록 (Action 기반) -->
+                <lightning-tab label="액션 목록" value="action">
+                    <template if:true={hasActionLogs}>
+                        <div class="table-container slds-scrollable_y slds-m-top_small" style="max-height: 500px;">
+                            <lightning-datatable
+                                key-field="Id"
+                                data={actionLogs}
+                                columns={actionColumns}
+                                hide-checkbox-column="true">
+                            </lightning-datatable>
+                        </div>
+                    </template>
+                    <template if:false={hasActionLogs}>
+                        <template if:true={actionDataLoaded}>
+                            <div class="slds-text-color_weak slds-p-around_medium">
+                                <p>실행된 액션 로그가 없습니다.</p>
+                                <p class="slds-m-top_x-small">감지 목록에서 <b>계정 즉시 동결</b> 또는 <b>시스템 권한 축소</b>를 실행하면 여기에 기록됩니다.</p>
+                            </div>
+                        </template>
+                    </template>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+</template>

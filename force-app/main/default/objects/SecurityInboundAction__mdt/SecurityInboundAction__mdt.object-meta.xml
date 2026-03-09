@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>인바운드 요청의 action 파라미터 → ISecurityAction 구현체 매핑. SecurityIntegration__mdt와 분리(아웃바운드 전용).</description>
+    <label>Security Inbound Action</label>
+    <visibility>Public</visibility>
+</CustomObject>
