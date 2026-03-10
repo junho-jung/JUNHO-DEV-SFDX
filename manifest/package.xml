@@ -112,6 +112,15 @@
         <members>UtilTrigger</members>
         <members>UtilUser</members>
         <members>UtilWithoutSharing</members>
+        <members>ApiEventExtractor</members>
+        <members>DefaultEventExtractor</members>
+        <members>IEventExtractor</members>
+        <members>ISecurityFilter</members>
+        <members>LoginEventExtractor</members>
+        <members>ReportEventExtractor</members>
+        <members>SecurityFilterChain</members>
+        <members>SecurityPolicyResolver</members>
+        <members>SecurityThrottleFilter</members>
         <name>ApexClass</name>
     </types>
     <types>
@@ -273,6 +282,7 @@
         <members>SecurityAuditLog__c.Source__c</members>
         <members>SecurityAuditLog__c.User__c</members>
         <members>SecurityInboundAction__mdt.ActionClassName__c</members>
+        <members>SecurityInboundAction__mdt.ExecutionMode__c</members>
         <members>SecurityInboundAction__mdt.InboundActionType__c</members>
         <members>SecurityInboundAction__mdt.RequiresToken__c</members>
         <members>SecurityInboundConfig__mdt.AllowedRefererHosts__c</members>
@@ -326,6 +336,17 @@
         <members>SecurityPolicy.SENSITIVE_LISTVIEW_MFA</members>
         <members>TriggerHandlerSetting.SecurityActionRequest_tr</members>
         <members>TriggerHandlerSetting.SecurityAlert_tr</members>
+        <members>SecurityInboundAction.CREATECASE</members>
+        <members>SecurityInboundAction.FREEZEUSER</members>
+        <members>SecurityInboundAction.KILLSESSION</members>
+        <members>SecurityInboundAction.NOTIFYMANAGEREMAIL</members>
+        <members>SecurityInboundAction.NOTIFYSLACK</members>
+        <members>SecurityInboundAction.NOTIFYTEAMS</members>
+        <members>SecurityInboundAction.QUARANTINEPROFILE</members>
+        <members>SecurityInboundAction.REQUIREMFAPASSWORDRESET</members>
+        <members>SecurityInboundAction.RESTRICTPERMISSION</members>
+        <members>SecurityInboundAction.REVOKEOAUTHTOKENS</members>
+        <members>SecurityInboundAction.SENDTOSIEM</members>
         <name>CustomMetadata</name>
     </types>
     <types>

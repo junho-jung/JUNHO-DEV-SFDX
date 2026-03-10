@@ -21,93 +21,46 @@ public class SecurityActionFactory {
         // 대소문자 구분 없이 처리하기 위해 Uppercase 변환
         String formattedType = actionType.trim().toUpperCase();
 
-        switch on formattedType {
+        try {
+            List<SecurityInboundAction__mdt> mappings = [
+                SELECT ActionClassName__c, ExecutionMode__c
+                FROM SecurityInboundAction__mdt 
+                WHERE InboundActionType__c = :formattedType 
+                LIMIT 1
+            ];
 
-            // [SYNC] 즉각적인 대응이 필요한 사용자 제어 액션
-            when 'KILL_SESSION' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityKillSessionAction(),
-                    SecurityTypes.ActionExecutionMode.SYNC
-                );
-            }
-
-            when 'FREEZE_USER' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityFreezeUserAction(),
-                    SecurityTypes.ActionExecutionMode.SYNC
-                );
-            }
-
-            when 'REVOKE_OAUTH_TOKENS' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityRevokeOauthTokensAction(),
-                    SecurityTypes.ActionExecutionMode.SYNC
-                );
-            }
-
-            when 'QUARANTINE_PROFILE' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityQuarantineProfileAction(),
-                    SecurityTypes.ActionExecutionMode.SYNC
-                );
-            }
-
-            when 'REQUIRE_MFA_PASSWORD_RESET' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityResetPasswordAction(),
-                    SecurityTypes.ActionExecutionMode.SYNC
-                );
-            }
-
-            when 'RESTRICT_PERMISSION' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityRestrictPermissionAction(),
-                    SecurityTypes.ActionExecutionMode.SYNC
-                );
-            }
-
-            // [ASYNC] 외부 연동이나 데이터 생성 등 지연 실행이 가능한 액션
-            when 'NOTIFY_SLACK' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityNotifySlackAction(),
-                    SecurityTypes.ActionExecutionMode.ASYNC
-                );
-            }
-
-            when 'NOTIFY_TEAMS' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityNotifyTeamsAction(),
-                    SecurityTypes.ActionExecutionMode.ASYNC
-                );
-            }
-
-            when 'NOTIFY_MANAGER_EMAIL' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityNotifyManagerEmailAction(),
-                    SecurityTypes.ActionExecutionMode.ASYNC
-                );
-            }
-
-            when 'CREATE_CASE' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecurityCreateCaseAction(),
-                    SecurityTypes.ActionExecutionMode.ASYNC
-                );
-            }
-
-            when 'SEND_TO_SIEM' {
-                return new SecurityTypes.ActionDescriptor(
-                    new SecuritySendToSiemAction(),
-                    SecurityTypes.ActionExecutionMode.ASYNC
-                );
-            }
-
-            when else {
+            if (mappings.isEmpty()) {
                 SecuritySoarTrace.log('SecurityActionFactory.getAction.unknown_action', new Map<String, Object>{
-                    'actionType' => actionType
+                    'actionType' => formattedType
                 });
                 return null;
             }
+
+            SecurityInboundAction__mdt mapping = mappings[0];
+
+            // 리플렉션(Reflection)을 통한 동적 인스턴스 생성
+            Type t = Type.forName(mapping.ActionClassName__c);
+            if (t == null) {
+                SecuritySoarTrace.log('SecurityActionFactory.getAction.invalid_class', new Map<String, Object>{
+                    'className' => mapping.ActionClassName__c
+                });
+                return null;
+            }
+
+            ISecurityAction actionInstance = (ISecurityAction) t.newInstance();
+            
+            SecurityTypes.ActionExecutionMode mode = mapping.ExecutionMode__c == 'ASYNC' 
+                ? SecurityTypes.ActionExecutionMode.ASYNC 
+                : SecurityTypes.ActionExecutionMode.SYNC;
+
+            return new SecurityTypes.ActionDescriptor(actionInstance, mode);
+
+        } catch (Exception e) {
+            SecuritySoarTrace.log('SecurityActionFactory.getAction.error', new Map<String, Object>{
+                'error' => e.getMessage(),
+                'actionType' => formattedType
+            });
+            return null;
         }
     }
 }

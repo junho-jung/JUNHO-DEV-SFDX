@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>KILL_SESSION</label>
+    <protected>false</protected>
+    <values>
+        <field>ActionClassName__c</field>
+        <value xsi:type="xsd:string">SecurityKillSessionAction</value>
+    </values>
+    <values>
+        <field>ExecutionMode__c</field>
+        <value xsi:type="xsd:string">SYNC</value>
+    </values>
+    <values>
+        <field>InboundActionType__c</field>
+        <value xsi:type="xsd:string">KILL_SESSION</value>
+    </values>
+    <values>
+        <field>RequiresToken__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+</CustomMetadata>
