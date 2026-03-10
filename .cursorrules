@@ -1,5 +1,23 @@
 Salesforce DX project.Use force-app/main/default only.Never create src,metadata,mdapi.
 
+AI must never execute Salesforce deployment commands.
+
+All deployment actions must be performed manually by the developer.
+
+Agents must not run CLI commands unless explicitly instructed by the user.
+
+## Critical Safety Rule
+Never run deployment commands.
+
+Forbidden commands include but are not limited to:
+- sf deploy
+- sf project deploy start
+- sfdx force:source:deploy
+- sfdx force:mdapi:deploy
+
+The AI must only generate or modify code.
+All deployments must be performed manually by the developer.
+
 Paths:
 classes:force-app/main/default/classes
 lwc:force-app/main/default/lwc
