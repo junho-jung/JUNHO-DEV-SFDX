@@ -86,11 +86,6 @@ public class SecurityAlertHandler {
         }
     }
 
-    /**
-     * @description 정책(SecurityPolicy__mdt)과 이벤트 자체(ActionType__c)를 합쳐 최종 액션 목록을 만든 뒤 실행.
-     *              - SecurityPolicy__mdt.ActionTypes__c : 정책에 정의된 기본 액션 목록
-     *              - SecurityAlert__e.ActionType__c  : 이벤트에서 추가로 지정한 액션 목록
-     */
     private static void executeActions(AlertRecord alert, Decimal alertCount) {
         SecuritySoarTrace.log('SecurityAlertHandler.executeActions', new Map<String, Object>{
             'eventKey' => alert != null ? alert.EventKey : null,
@@ -98,61 +93,21 @@ public class SecurityAlertHandler {
             'alertCount' => alertCount,
             'severity' => alert != null ? alert.Severity : null
         });
-        List<String> mergedTypes = new List<String>();
 
-        // 1) 정책 기반 점진적 액션 (PolicyCode__c 기준)
-        SecurityPolicy__mdt policy = null;
-        if (!String.isBlank(alert.PolicyCode)) {
-            try {
-                policy = SecurityGuard.getPolicy(alert.PolicyCode);
-                if (policy != null) {
-                    Boolean matchedDynamic = false;
+        // 1. 정책 병합 로직 분리 (SecurityPolicyResolver)
+        SecurityPolicyResolver.Result policyResult = SecurityPolicyResolver.mergePolicies(alert, alertCount);
+        Set<String> finalTypes = policyResult.actionTypes;
+        SecurityPolicy__mdt policy = policyResult.policy;
 
-                    // 점진적 임계치 판별 (높은 단계부터 하향식 판별)
-                    if (policy.ThresholdCritical__c != null && alertCount >= policy.ThresholdCritical__c && !String.isBlank(policy.ActionCritical__c)) {
-                        mergedTypes.addAll(policy.ActionCritical__c.split(';'));
-                        matchedDynamic = true;
-                    } else if (policy.ThresholdMedium__c != null && alertCount >= policy.ThresholdMedium__c && !String.isBlank(policy.ActionMedium__c)) {
-                        mergedTypes.addAll(policy.ActionMedium__c.split(';'));
-                        matchedDynamic = true;
-                    } else if (policy.ThresholdLow__c != null && alertCount >= policy.ThresholdLow__c && !String.isBlank(policy.ActionLow__c)) {
-                        mergedTypes.addAll(policy.ActionLow__c.split(';'));
-                        matchedDynamic = true;
-                    }
+        if (finalTypes == null || finalTypes.isEmpty()) return;
 
-                    // 일치하는 동적 룰이 없거나 메타데이터에 미지정된 경우, 기본 ActionTypes__c 로 Fallback
-                    if (!matchedDynamic && !String.isBlank(policy.ActionTypes__c)) {
-                        mergedTypes.addAll(policy.ActionTypes__c.split(';'));
-                    }
-                }
-            } catch (Exception e) {
-                System.debug(LoggingLevel.WARN, 'SecurityAlertHandler ::: Failed to evaluate SecurityPolicy__mdt logic: ' + e.getMessage());
-            }
-        }
-
-        // 2) 이벤트 자체에 실린 액션
-        if (!String.isBlank(alert.ActionType)) {
-            mergedTypes.addAll(alert.ActionType.split(';'));
-        }
-
-        // 정리: trim + 중복 제거
-        Set<String> finalTypes = new Set<String>();
-        for (String t : mergedTypes) {
-            String tt = t != null ? t.trim() : null;
-            if (!String.isBlank(tt)) {
-                finalTypes.add(tt);
-            }
-        }
-
-        if (finalTypes.isEmpty()) return;
-
-        // 3) [Throttling] 초과 시 액션 스킵
+        // 2. 실행 파이프라인 (책임 연쇄 / 필터 체인 통과 확인)
         for (String aType : finalTypes) {
             SecurityTypes.ActionDescriptor actionDesc = SecurityActionFactory.getAction(aType);
             if (actionDesc == null) continue;
-            String logActionName = String.valueOf(actionDesc.action).substringBefore(':');
-            if (SecurityActionThrottle.isThrottled(alert.UserId, alert.PolicyCode, logActionName)) {
-                System.debug(LoggingLevel.WARN, 'SecurityAlertHandler ::: Throttled: ' + aType);
+
+            // 서킷 브레이커 및 허용 여부 판별 분리 (SecurityFilterChain)
+            if (!SecurityFilterChain.isAllowed(alert, aType, actionDesc)) {
                 continue;
             }
 
@@ -168,6 +123,7 @@ public class SecurityAlertHandler {
                 }
             }
 
+            // 3. 실제 실행
             SecurityActionExecutor.execute(
                 actionDesc.action,
                 finalPayload,

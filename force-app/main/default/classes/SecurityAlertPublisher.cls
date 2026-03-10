@@ -102,41 +102,21 @@ public with sharing class SecurityAlertPublisher {
         };
     }
 
+    public static Map<SObjectType, IEventExtractor> extractors = new Map<SObjectType, IEventExtractor>{
+        ReportEvent.SObjectType => new ReportEventExtractor(),
+        ApiEvent.SObjectType    => new ApiEventExtractor(),
+        LoginEvent.SObjectType  => new LoginEventExtractor()
+    };
+
     /**
-     * @description 이벤트 타입별로 리소스 ID, 이름, 타입을 동적으로 추출
+     * @description 이벤트 타입별로 다형성(Strategy) 패턴을 이용해 리소스 추출
      */
     private static ResourceInfo extractResourceInfo(SObject rawEvent, Map<String, Object> payload) {
-        ResourceInfo info = new ResourceInfo();
-
-        if (rawEvent instanceof ReportEvent) {
-            ReportEvent re = (ReportEvent) rawEvent;
-            info.setValues(re.ReportId, getReportName(re.ReportId), 'ReportEvent');
-            payload.put('actionName', re.ActionName);
-            payload.put('format', re.Format);
+        IEventExtractor extractor = extractors.get(rawEvent.getSObjectType());
+        if (extractor == null) {
+            extractor = new DefaultEventExtractor();
         }
-        else if (rawEvent instanceof ApiEvent) {
-            ApiEvent ae = (ApiEvent) rawEvent;
-            info.setValues(ae.LoginHistoryId, ae.Query, 'ApiEvent');
-            payload.put('query', ae.Query);
-            payload.put('rows', ae.RowsProcessed);
-        }
-        else if (rawEvent instanceof LoginEvent) {
-            LoginEvent le = (LoginEvent) rawEvent;
-            info.setValues(le.LoginHistoryId, le.LoginType, 'LoginEvent');
-            payload.put('sourceIp', le.SourceIp);
-            payload.put('status', le.Status);
-        }
-        else {
-            String objName = rawEvent.getSObjectType().getDescribe().getName();
-            info.setValues((String)rawEvent.get('EventIdentifier'), 'Event: ' + objName, objName);
-        }
-
-        // 이름이 너무 길 경우(API Query 등) 가독성을 위해 자동 생략 처리 가능
-//        if (info.name != null && info.name.length() > 255) {
-//            info.name = info.name.substring(0, 252) + ...";
-//        }
-
-        return info;
+        return extractor.extract(rawEvent, payload);
     }
 
     private static void emitEvent(SecurityAlert__e alert) {
@@ -195,15 +175,9 @@ public with sharing class SecurityAlertPublisher {
         );
     }
 
-    private static String getReportName(Id reportId) {
-        if (reportId == null) return 'N/A';
-        for (Report r : [SELECT Name FROM Report WHERE Id = :reportId LIMIT 1]) return r.Name;
-        return 'Unknown Report (' + reportId + ')';
-    }
-
     // 데이터 전달용 내부 클래스
-    private class ResourceInfo {
-        String id, name, type;
-        void setValues(String i, String n, String t) { id = i; name = n; type = t; }
+    public class ResourceInfo {
+        public String id, name, type;
+        public void setValues(String i, String n, String t) { id = i; name = n; type = t; }
     }
 }
