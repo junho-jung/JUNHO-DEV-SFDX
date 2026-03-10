@@ -7,17 +7,16 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public with sharing class Util_SObjectUtil {
+public without sharing class UtilObject {
 
     /**
-     * @description SObject에서 해당 필드를 추출하여 String으로 변환
-     * @param sObj SObject API
-     * @param fieldApi Field API
+     * @description Object -> String
+     * @param obj Object
      *
      * @return String
      */
-    public String toString(SObject sObj, String fieldApi) {
-        Object value = sObj.get(fieldApi);
-        return Core.Object2.toString(value);
+    public String toString(Object obj) {
+        return obj == null ? null : String.valueOf(obj);
     }
+
 }

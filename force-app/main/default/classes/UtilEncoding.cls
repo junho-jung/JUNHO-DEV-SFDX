@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_EncodingUtil {
+public without sharing class UtilEncoding {
 
     /**
      * @description URL Encode

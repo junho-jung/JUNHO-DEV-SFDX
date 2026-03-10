@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_UserUtil {
+public without sharing class UtilUser {
 
     /** Whether Test or not */
     //private final Boolean IS_TEST = Test.isRunningTest();
@@ -56,7 +56,7 @@ public without sharing class Util_UserUtil {
      * @return Map<String, UserRecordAccess>
      */
     public Map<String, AccessCls> getRecordAccess(Id userId, List<SObject> recordList) {
-        System.debug(LoggingLevel.INFO, '==================== Util_UserUtil.getRecordAccess ===============================');
+        System.debug(LoggingLevel.INFO, '==================== UtilUser.getRecordAccess ===============================');
         Set<Id> recordIdSet = new Set<Id>();
         for(SObject record : recordList){
             recordIdSet.add(record.Id);

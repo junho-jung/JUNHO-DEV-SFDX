@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public with sharing class Util_StringUtil {
+public with sharing class UtilString {
 
     /**
     * @description NVL(값, NULL 반환값)

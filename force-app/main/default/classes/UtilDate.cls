@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_DateUtil {
+public without sharing class UtilDate {
 
     /** Whether Test or not */
     private final static Boolean IS_TEST = Test.isRunningTest();

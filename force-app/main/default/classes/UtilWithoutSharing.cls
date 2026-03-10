@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public with sharing class Util_WithoutSharingUtil {
+public with sharing class UtilWithoutSharing {
 
     /**
      * @description SObject 조회 및 반환

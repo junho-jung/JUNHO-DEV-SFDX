@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_SchemaUtil {
+public without sharing class UtilSchema {
     /** Whether Test or not */
     private final Boolean IS_TEST = Test.isRunningTest();
 
@@ -458,7 +458,7 @@ public without sharing class Util_SchemaUtil {
      * @return LayoutCls
      */
     public LayoutCls getPageLayout(String layoutName){
-        System.debug(LoggingLevel.INFO, '==================== Util_SchemaUtil.getPageLayout ===============================');
+        System.debug(LoggingLevel.INFO, '==================== UtilSchema.getPageLayout ===============================');
 
         List<Metadata.Metadata> layouts = Metadata.Operations.retrieve(Metadata.MetadataType.Layout, new List<String>{layoutName});
 

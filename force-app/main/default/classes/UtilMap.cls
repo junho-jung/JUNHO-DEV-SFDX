@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_MapUtil {
+public without sharing class UtilMap {
 
     public Boolean isBlank(Map<String, Object> targetMap){
         return (targetMap == null || targetMap.isEmpty()) ? true : false;

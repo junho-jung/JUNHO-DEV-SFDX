@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public with sharing class Util_RelatedListParameters {
+public with sharing class UtilRelatedListParameters {
 
     @AuraEnabled public String recordId {get;set;}
     @AuraEnabled public String currentObjectApi {get;set;}

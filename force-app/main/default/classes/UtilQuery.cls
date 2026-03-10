@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_QueryUtil {
+public without sharing class UtilQuery {
 
     /**
      * @description 모든 필드를 포함한 쿼리 String을 반환

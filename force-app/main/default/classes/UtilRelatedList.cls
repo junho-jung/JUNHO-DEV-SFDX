@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public abstract with sharing class Util_RelatedListUtil {
+public abstract with sharing class UtilRelatedList {
 
     /** Whether Test or not */
     private final static Boolean IS_TEST = Test.isRunningTest();
@@ -19,7 +19,7 @@ public abstract with sharing class Util_RelatedListUtil {
      * @return List<String>
      */
     public virtual List<String> getColumnList(String fields){
-        System.debug(LoggingLevel.INFO, '==================== Util_RelatedListUtil.getColumnList ===============================');
+        System.debug(LoggingLevel.INFO, '==================== UtilRelatedList.getColumnList ===============================');
         List<String> columnList = new List<String>();
         if(String.isNotBlank(fields)) columnList.addAll(fields.deleteWhitespace().split(','));
         return columnList;
@@ -28,16 +28,16 @@ public abstract with sharing class Util_RelatedListUtil {
     public final Map<String, String> columnMap = new Map<String, String>();
     /**
      * @description 관련 오브젝트 정보 반환
-     * @param params Util_RelatedListParameters
+     * @param params UtilRelatedListParameters
      * @param columnList List<String>
      *
-     * @return Map<String, Util_RelatedListUtil.RelatedObjectCls>
+     * @return Map<String, UtilRelatedList.RelatedObjectCls>
      */
-    public virtual Map<String, Util_RelatedListUtil.RelatedObjectCls> getRelatedObject(Util_RelatedListParameters params, List<String> columnList){
-        System.debug(LoggingLevel.INFO, '==================== Util_RelatedListUtil.getRelatedObject ===============================');
+    public virtual Map<String, UtilRelatedList.RelatedObjectCls> getRelatedObject(UtilRelatedListParameters params, List<String> columnList){
+        System.debug(LoggingLevel.INFO, '==================== UtilRelatedList.getRelatedObject ===============================');
 
 
-        // Util_RelatedListParameters params,
+        // UtilRelatedListParameters params,
         String objApi = params.currentObjectApi,
             relatedObjApi = params.targetObjectApi;
 
@@ -129,7 +129,7 @@ public abstract with sharing class Util_RelatedListUtil {
      * @return Map<String, String>
      */
     private Map<String, String> getRelationMap(String objName){
-        System.debug(LoggingLevel.INFO, '==================== Util_RelatedListUtil.getRelationMap ===============================');
+        System.debug(LoggingLevel.INFO, '==================== UtilRelatedList.getRelationMap ===============================');
 
         if(objectRelationMap.containsKey(objName)) return objectRelationMap.get(objName);
 
@@ -150,10 +150,10 @@ public abstract with sharing class Util_RelatedListUtil {
      * @return Map<String, Schema.DescribeFieldResult>
      */
     private Map<String, Schema.DescribeFieldResult> getFieldMap(String objName){
-        System.debug(LoggingLevel.INFO, '==================== Util_RelatedListUtil.getFieldMap ===============================');
+        System.debug(LoggingLevel.INFO, '==================== UtilRelatedList.getFieldMap ===============================');
         if(objectFieldMap.containsKey(objName)) return objectFieldMap.get(objName);
         Map<String, Schema.DescribeFieldResult> fieldMap = new Map<String, Schema.DescribeFieldResult>();
-        for(Schema.SObjectField field : new Util_SchemaUtil().GLOBAL_DESCRIBE.get(objName).getDescribe().fields.getMap().values()){
+        for(Schema.SObjectField field : new UtilSchema().GLOBAL_DESCRIBE.get(objName).getDescribe().fields.getMap().values()){
             Schema.DescribeFieldResult f = field.getDescribe();
             fieldMap.put(f.getName(), f);
         }
@@ -165,21 +165,21 @@ public abstract with sharing class Util_RelatedListUtil {
      * @description Object 정보 반환
      * @param objectApiSet Set<Object API>
      *
-     * @return Map<String, Util_RelatedListUtil.RelatedObjectCls>
+     * @return Map<String, UtilRelatedList.RelatedObjectCls>
      */
-    private Map<String, Util_RelatedListUtil.RelatedObjectCls> getDescribedObjectMap(Set<String> objectApiSet) {
-        System.debug(LoggingLevel.INFO, '==================== Util_RelatedListUtil.getDescribedObjectMap ===============================');
+    private Map<String, UtilRelatedList.RelatedObjectCls> getDescribedObjectMap(Set<String> objectApiSet) {
+        System.debug(LoggingLevel.INFO, '==================== UtilRelatedList.getDescribedObjectMap ===============================');
         /*
         From the v52, Opportunity's describe get the pipe line related fields if the pipe line is active.
         So we should adjust the class api version to below than 52
          */
 
         // All SObject
-        Map<String, Util_RelatedListUtil.RelatedObjectCls> objectMap = new Map<String, Util_RelatedListUtil.RelatedObjectCls>();
+        Map<String, UtilRelatedList.RelatedObjectCls> objectMap = new Map<String, UtilRelatedList.RelatedObjectCls>();
         for(String sObjectType : objectApiSet){
-            Util_RelatedListUtil.RelatedObjectCls objCls = new Util_RelatedListUtil.RelatedObjectCls();
+            UtilRelatedList.RelatedObjectCls objCls = new UtilRelatedList.RelatedObjectCls();
 
-            DescribeSObjectResult describeResult = new Util_SchemaUtil().GLOBAL_DESCRIBE.get(sObjectType).getDescribe();
+            DescribeSObjectResult describeResult = new UtilSchema().GLOBAL_DESCRIBE.get(sObjectType).getDescribe();
 
             objCls.name = describeResult.getName();
             objCls.label = describeResult.getLabel();
@@ -187,7 +187,7 @@ public abstract with sharing class Util_RelatedListUtil {
             objCls.isCustom = describeResult.isCustom();
 
             for(RecordTypeInfo rt : describeResult.getRecordTypeInfos()){
-                objCls.recordTypes.add(new Util_RelatedListUtil.RecordTypeCls(rt));
+                objCls.recordTypes.add(new UtilRelatedList.RecordTypeCls(rt));
             }
 
             Map<String, Schema.SObjectField> describedFields = describeResult.fields.getMap();
@@ -198,7 +198,7 @@ public abstract with sharing class Util_RelatedListUtil {
 
                 Schema.DescribeFieldResult f = field.getDescribe();
 
-                Util_RelatedListUtil.FieldCls fc = new Util_RelatedListUtil.FieldCls();
+                UtilRelatedList.FieldCls fc = new UtilRelatedList.FieldCls();
                 fc.api = f.getName();
                 fc.label = f.getLabel();
                 fc.required = !f.isNillable();
@@ -210,9 +210,9 @@ public abstract with sharing class Util_RelatedListUtil {
                 fc.objectApi = objCls.name;
 
                 if('PICKLIST'.equals(fc.fieldType)){
-                    fc.optionList = new List<Util_RelatedListUtil.OptionCls>();
+                    fc.optionList = new List<UtilRelatedList.OptionCls>();
                     for(Schema.PicklistEntry pick : field.getDescribe().getPicklistValues()){
-                        Util_RelatedListUtil.OptionCls oc = new Util_RelatedListUtil.OptionCls();
+                        UtilRelatedList.OptionCls oc = new UtilRelatedList.OptionCls();
                         oc.label = pick.getLabel();
                         oc.value = pick.getValue();
                         fc.optionList.add(oc);
@@ -227,8 +227,8 @@ public abstract with sharing class Util_RelatedListUtil {
         return objectMap;
     }
 
-    public virtual ResultCls getRelatedRecord(Util_RelatedListParameters params, SObject currentRecord, Map<String, Util_RelatedListUtil.RelatedObjectCls> relatedObjectMap){
-        System.debug(LoggingLevel.INFO, '==================== Util_RelatedListUtil.getRelatedRecord ===============================');
+    public virtual ResultCls getRelatedRecord(UtilRelatedListParameters params, SObject currentRecord, Map<String, UtilRelatedList.RelatedObjectCls> relatedObjectMap){
+        System.debug(LoggingLevel.INFO, '==================== UtilRelatedList.getRelatedRecord ===============================');
 
         String recordId = params.recordId,
             currentObjectApi = params.currentObjectApi,
@@ -270,10 +270,10 @@ public abstract with sharing class Util_RelatedListUtil {
 
             System.debug(query);
             // 레코드 조회
-            List<SObject> recordList = isWithOutSharing ? Util_WithoutSharingUtil.getQueryWithBinds(query, new Map<String, Object>(), AccessLevel.SYSTEM_MODE) : Database.query(query);
+            List<SObject> recordList = isWithOutSharing ? UtilWithoutSharing.getQueryWithBinds(query, new Map<String, Object>(), AccessLevel.SYSTEM_MODE) : Database.query(query);
 
             // todo User Access
-            Map<String, Util_UserUtil.AccessCls> accessMap = new Map<String, Util_UserUtil.AccessCls>();
+            Map<String, UtilUser.AccessCls> accessMap = new Map<String, UtilUser.AccessCls>();
             if(needAccessCheck && !recordList.isEmpty()) accessMap = Core.User2.getRecordAccess(UserInfo.getUserId(), recordList);
 
 
@@ -291,7 +291,7 @@ public abstract with sharing class Util_RelatedListUtil {
                 RecordCls recordCls = new RecordCls();
                 recordCls.record = record;
 
-                Util_UserUtil.AccessCls recordAccess = accessMap.get(record.Id);
+                UtilUser.AccessCls recordAccess = accessMap.get(record.Id);
                 recordCls.hasReadAccess = needAccessCheck ? recordAccess.HasReadAccess : true;
                 recordCls.hasEditAccess = needAccessCheck ? recordAccess.HasEditAccess : true;
                 recordCls.hasDeleteAccess = needAccessCheck ? recordAccess.HasDeleteAccess : true;
@@ -580,8 +580,8 @@ public abstract with sharing class Util_RelatedListUtil {
      *
      * @return String
      */
-    private String refineColumns(String columns, Map<String, Util_RelatedListUtil.RelatedObjectCls> relatedObjectMap){
-        System.debug(LoggingLevel.INFO, '==================== Util_RelatedListUtil.refineColumns ===============================');
+    private String refineColumns(String columns, Map<String, UtilRelatedList.RelatedObjectCls> relatedObjectMap){
+        System.debug(LoggingLevel.INFO, '==================== UtilRelatedList.refineColumns ===============================');
 
         List<String> refinedColumnList = new List<String>();
 
@@ -591,7 +591,7 @@ public abstract with sharing class Util_RelatedListUtil {
 
                 Boolean isRelation = isRelation(column);
 
-                Util_RelatedListUtil.FieldCls fc = relatedObjectMap.get(objApi).fieldMap.get(isRelation ? column.substringAfterLast('.') : column);
+                UtilRelatedList.FieldCls fc = relatedObjectMap.get(objApi).fieldMap.get(isRelation ? column.substringAfterLast('.') : column);
 
                 Boolean isCustom = fc.isCustom;
                 String api = fc.api;
@@ -619,14 +619,14 @@ public abstract with sharing class Util_RelatedListUtil {
         refinedColumnList.add('Id');
 
         // 2024.07.08 - sy.lee - Group 같은 경우 CurrencyIsoCode가 없을 수 있으므로 해당 코드 주석 처리
-        /*if(Util_SchemaUtil.GLOBAL_DESCRIBE.containsKey('CurrencyType')){
+        /*if(UtilSchema.GLOBAL_DESCRIBE.containsKey('CurrencyType')){
             refinedColumnList.add('CurrencyIsoCode');
         }*/
 
         return String.join(refinedColumnList, ',');
     }
 
-    /*public virtual ResultCls getTotalRecordCount(Util_RelatedListParameters params, SObject currentRecord){
+    /*public virtual ResultCls getTotalRecordCount(UtilRelatedListParameters params, SObject currentRecord){
         ResultCls rc = new ResultCls();
 
         String targetObjectApi = params.targetObjectApi,
@@ -662,8 +662,8 @@ public abstract with sharing class Util_RelatedListUtil {
         return rc;
     }*/
 
-    public virtual Util_RelatedListUtil.CurrentObjectCls getCurrentObject(Util_RelatedListParameters params) {
-        System.debug(LoggingLevel.INFO, '==================== Util_RelatedListUtil.getCurrentObject ===============================');
+    public virtual UtilRelatedList.CurrentObjectCls getCurrentObject(UtilRelatedListParameters params) {
+        System.debug(LoggingLevel.INFO, '==================== UtilRelatedList.getCurrentObject ===============================');
 
         String recordId = params.recordId,
             currentObjectApi = params.currentObjectApi,
@@ -673,7 +673,7 @@ public abstract with sharing class Util_RelatedListUtil {
 
 
         DescribeSObjectResult currentObject = Core.Schema2.getObjectResult(currentObjectApi);
-        Util_RelatedListUtil.CurrentObjectCls cc = new Util_RelatedListUtil.CurrentObjectCls();
+        UtilRelatedList.CurrentObjectCls cc = new UtilRelatedList.CurrentObjectCls();
         cc.name = currentObject.getName();
         cc.label = currentObject.getLabel();
         cc.labelPlural = currentObject.getLabelPlural();
@@ -718,8 +718,8 @@ public abstract with sharing class Util_RelatedListUtil {
 
     // =================================================================================================================
     // Sharing 구분을 위한 Inner Class
-    public with sharing class WithSharing extends Util_RelatedListUtil{}
-    public without sharing class WithoutSharing extends Util_RelatedListUtil{}
+    public with sharing class WithSharing extends UtilRelatedList{}
+    public without sharing class WithoutSharing extends UtilRelatedList{}
 
     // =================================================================================================================
     // 정보를 넣기위한 Inner Class
@@ -806,7 +806,7 @@ public abstract with sharing class Util_RelatedListUtil {
         //@AuraEnabled public String orgDomain = (isCommunity ? [SELECT SecureUrl FROM SiteDetail WHERE DurableId = :Site.getSiteId() LIMIT 1].SecureUrl : Url.getOrgDomainUrl().toExternalForm()) + '/';
         @AuraEnabled public List<RecordCls> recordList;
         @AuraEnabled public Integer totalRecordCount = 0;
-        //@AuraEnabled public Util_RelatedListUtil.CurrentObjectCls currentObject;
+        //@AuraEnabled public UtilRelatedList.CurrentObjectCls currentObject;
         //@AuraEnabled public TargetObjectCls parent;
         @AuraEnabled public String query;      // Refresh를 위해 Query를 담는다
         @AuraEnabled public String countQuery; // Refresh를 위해 Query를 담는다

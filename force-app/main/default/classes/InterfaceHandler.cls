@@ -107,7 +107,7 @@ public virtual with sharing class InterfaceHandler {
             String finalEndpoint = this.configuredEndpoint;
             if (qParams != null && !qParams.isEmpty()) {
                 // 가정된 유틸리티 클래스 사용
-                // Util_HttpUtil.ParameterBuilder urlBuilder = Core.Http2.setEndpoint(finalEndpoint);
+                // UtilHttp.ParameterBuilder urlBuilder = Core.Http2.setEndpoint(finalEndpoint);
                 // for (String key : qParams.keySet()) {
                 //     urlBuilder.append(key, qParams.get(key));
                 // }

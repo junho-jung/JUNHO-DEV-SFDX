@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_HttpUtil {
+public without sharing class UtilHttp {
 
     /**
      * @description Http Query Parameter 추가

@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_OrgUtil {
+public without sharing class UtilOrg {
 
     /** Whether Test or not */
     private final Boolean IS_TEST = Test.isRunningTest();

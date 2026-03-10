@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_DatetimeUtil {
+public without sharing class UtilDatetime {
 
 
     /**

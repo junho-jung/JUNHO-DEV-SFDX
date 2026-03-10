@@ -7,7 +7,7 @@
   ===================================================================================
   1.0      2025-11-24      jh.jung           Created
 */
-public without sharing class Util_ListUtil {
+public without sharing class UtilList {
 
     /**
      * @description split list to list of list
