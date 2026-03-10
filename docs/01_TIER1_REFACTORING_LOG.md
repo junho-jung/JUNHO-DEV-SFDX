@@ -40,3 +40,86 @@
 ---
 
 > 💡 **다음 단계 (Next Steps):** Tier 1 작업이 성공적으로 컴파일됨에 따라, 구조적 기술 부채를 완전히 덜어내기 위한 **Tier 2 (퍼사드 분할, 메타데이터 레지스트리, 웹훅 액션 통폐합)** 작업으로 이행할 준비가 완료되었습니다.
+
+---
+
+## 🧪 부록: Tier 1 리팩토링 기능 테스트 가이드 (Manual Testing)
+
+Tier 1 리팩토링으로 개선된 프레임워크 코어를 Salesforce Org 환경에서 직접 테스트하고 검증하시려면 다음 3가지 핵심 기능(Reflection, Chain of Responsibility, Strategy)이 정상 동작하는지 확인하시면 됩니다.
+
+### ✅ 1. Factory의 Reflection 동적 인스턴스화 테스트 (`SecurityActionFactory`)
+가장 먼저, 문자열(String) 이름만으로 클래스가 정상적으로 생성되고 모드(SYNC/ASYNC)가 올바르게 반환되는지 확인합니다.
+
+1.  개발자 콘솔을 열고 `Debug` -> `Open Execute Anonymous Window`를 클릭합니다.
+2.  아래 코드를 복사해서 실행(`Execute`)합니다.
+```apex
+// 1. FREEZE_USER 액션이 메타데이터 기반으로 잘 생성되는지 테스트
+ISecurityAction freezeAction = SecurityActionFactory.createAction('FREEZE_USER');
+System.debug('Freeze Action 생성 여부: ' + (freezeAction != null));
+
+// 2. 클래스 타입이 맞게 캐스팅 되었는지 확인
+System.debug('클래스 타입 매칭: ' + (freezeAction instanceof SecurityFreezeUserAction));
+
+// 3. ExecutionMode가 메타데이터의 설정대로 SYNC를 반환하는지 테스트
+System.debug('실행 모드 (예상값 SYNC): ' + SecurityActionFactory.getExecutionMode('FREEZE_USER'));
+
+// 4. 슬랙 알림 같은 비동기 액션 테스트
+System.debug('비동기 실행 모드 (예상값 ASYNC): ' + SecurityActionFactory.getExecutionMode('NOTIFY_SLACK'));
+```
+**[기대 결과]:** 코드 수정 없이 `SecurityInboundAction__mdt` 메타데이터에 등록된 정보를 바탕으로 클래스가 인스턴스화 되고, SYNC/ASYNC 모드를 읽어오는 로그가 보이면 성공입니다.
+
+### ✅ 2. Handler의 서킷 브레이커 & 필터 체인 테스트 (`SecurityAlertHandler`)
+방어 로직(Throttling)이 체인 형태로 잘 작동하여 과도한 요청을 차단하는지 테스트합니다.
+
+1. 콘솔 익명 실행에 아래 코드를 세팅합니다.
+2. `SecurityInboundConfig.Default.ThrottleMaxPerMinute__c`에 설정된 제한 횟수(예: 분당 10회)보다 많은 수의 이벤트를 강제로 발생시킵니다.
+```apex
+List<SecurityAlert__e> testAlerts = new List<SecurityAlert__e>();
+
+// 의도적으로 임계치 이상의 대량의 알럿을 동시에 버스에 태웁니다 (분당 10회 제한 초과 가정)
+// (주의: Org에 NIGHT_MASS_API 정책이 활성화되어 있어야 합니다.)
+for(Integer i = 0; i < 20; i++) {
+    testAlerts.add(new SecurityAlert__e(
+        EventKey__c = 'TEST_THROTTLE_' + i,
+        Source__c = 'TEST',
+        PolicyCode__c = 'NIGHT_MASS_API', 
+        Severity__c = 'Medium',
+        UserId__c = UserInfo.getUserId(),
+        ActionTypes__c = 'NOTIFY_SLACK'
+    ));
+}
+
+// 이벤트 발행 후 Handler가 작동할 것입니다.
+EventBus.publish(testAlerts);
+```
+**[기대 결과]:** SOAR 백그라운드 엔진 로그(`SecurityActionLog__c` 등)에서 처음 N개는 정상적으로 액션이 실행(또는 시도)되지만, 임계치를 넘는 순간 `SecurityThrottleFilter`가 개입하여 이벤트 페이로드가 차단되거나 로깅 시스템에 실패 로그가 기록되는 것이 확인되면 완벽합니다.
+
+### ✅ 3. Publisher의 다형성 추출 전략 테스트 (`SecurityAlertPublisher`)
+이 작업이 가장 화려한 리팩토링(거대한 if문 제거) 결과입니다. 서로 다른 두 종류의 임의 이벤트를 던져보고, Publisher가 자동으로 알맞은 Extractor를 찾아 데이터를 파싱하는지 확인합니다.
+
+1. 콘솔 익명 실행에 아래 코드를 입력합니다.
+```apex
+// A. ApiEvent 타입 테스트
+ApiEvent apiEvt = new ApiEvent(
+    QueriedEntities = 'Account, Contact',
+    Client = 'Postman'
+);
+SecurityAlert__e alert1 = SecurityAlertPublisher.publish(
+    'NIGHT_MASS_API', 'High', 'TEST_API', apiEvt, null, 'API_ABUSE_DETECTED'
+);
+System.debug('API Event ResourceInfo: ' + alert1.ResourceId__c + ' / ' + alert1.ResourceName__c);
+
+
+// B. ReportEvent 타입 테스트
+// (주의: Org에 Report가 하나 이상 존재해야 합니다.)
+Report testReport = [SELECT Id, Name FROM Report LIMIT 1];
+ReportEvent repEvt = new ReportEvent(
+    ReportId = testReport.Id,
+    Operation = 'ReportExported'
+);
+SecurityAlert__e alert2 = SecurityAlertPublisher.publish(
+    'DATA_EXPORT', 'Critical', 'TEST_REP', repEvt, null, 'MASS_EXPORT_DETECTED'
+);
+System.debug('Report Event ResourceInfo: ' + alert2.ResourceId__c + ' / ' + alert2.ResourceName__c);
+```
+**[기대 결과]:** `publish` 내부의 `instanceof` 분기문이 완전히 사라졌음에도 불구하고, A 케이스에서는 `ApiEventExtractor`가, B 케이스에서는 `ReportEventExtractor`가 정확히 매핑되어 로그상에 Api 이벤트의 리소스 정보(`QueriedEntities`)와 Report 이벤트의 이름(`Name`)이 올바르게 추출되어 Platform Event 객체에 담겨야 합니다.
