@@ -67,6 +67,7 @@ public class SecurityTypes {
         // [Action Processing Fields]
         public String actionStatus;     // 액션 처리 상태 (SUCCESS, ALREADY_FROZEN 등)
         public String actionMessage;    // 액션 처리 결과 메시지
+        public String actionButtons;    // [추가] 동적 노출 허용된 버튼 (예: FREEZE_USER;KILL_SESSION)
 
         // [UI 가공용 필드]
         public String alertTitle;   // 팀즈 카드 제목용
