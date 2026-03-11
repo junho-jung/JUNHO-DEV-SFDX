@@ -37,9 +37,10 @@
 2. **모니터링 & 대응 확장:**
     * 기존의 Tier 1 (Strategy, Reflection) 패턴과 시너지를 일으켜, 사용자는 코드 한 줄 건드리지 않고도 **동적 이벤트 추출 ➡️ 동적 액션 할당 ➡️ 정책 오버라이드 ➡️ 무종속성 외부 알림 발송** 까지 일련의 SOAR 흐름을 자유롭게 커스터마이징 가능합니다.
 
-4. **레거시 종속성 사장 (Deprecating Legacy Bridge):**
-    * 과거 사내 통신 프레임워크(`Interface__c` 오브젝트 및 `IInterfaceExecutor` 등) 호출을 중계하던 **`SecurityInterfaceBridge.cls` 클래스는 폐기(Deprecated) 수준으로 격하**되었습니다.
-    * 표준 `SecurityBaseWebhookAction` 클래스가 `HttpRequest`를 이용해 직접 Callout을 수행하므로, 코어 패키징 시에는 해당 브리지와 통신 프레임워크 파일 전체를 배제해도 무방합니다. (고객사가 자사 시스템 전용 커스텀 액션을 짤 때 참고할 만한 샘플 껍데기로만 남겨둠)
+4. **레거시 종속성 사장 및 패키지 배제 (Deprecating & Excluding Legacy Bridge):**
+    * 과거 사내 통신 프레임워크(`Interface__c` 오브젝트 및 `IInterfaceExecutor` 등) 호출을 중계하던 **`SecurityInterfaceBridge.cls` 클래스는 SOAR 코어 프레임워크 관점에서는 완전 폐기(Deprecated) 되었습니다.**
+    * **[중요] 패키징 경계선:** 향후 SOAR를 독립 관리형 패키지(Managed Package)로 빌드할 때, `SecurityInterfaceBridge.cls`는 **반드시 패키지에서 제외(Exclude)**되어야 합니다. 이 파일이 포함되는 순간 `Interface__c` 관련 사내 로직까지 패키지에 말려들어가는 강결합이 부활하게 됩니다.
+    * 만약 기존처럼 사내 Interface 프레임워크와 SOAR를 연결해야 하는 경우, 고객사(Local Org) 환경에서 패키지 외부의 언매니지드 코드로 `MyLegacyCustomAction` 및 `Bridge` 클래스를 수동으로 생성하여 연동하는 방식을 취해야 합니다. 즉, 이 브릿지는 패키지 코어가 아닌 **로컬 엑스텐션(Local Extension) 샘플**로만 취급됩니다.
 
 ---
 

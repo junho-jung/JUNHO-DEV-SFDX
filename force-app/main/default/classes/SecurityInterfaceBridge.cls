@@ -1,8 +1,9 @@
 /**
 * @Author            : jh.jung
 * @Description       : Security 액션에서 사내 자체 프레임워크인 Interface(RealTime/Queueable/Batch)를 호출하기 위한 브리지.
-* @Deprecated        : Tier 2 Flyweight 패턴 도입(`SecurityBaseWebhookAction`)으로 인해 SOAR의 핵심 웹훅 기능에서는 더 이상 이 브리지를 타지 않습니다.
-*                      고객사가 자체 레거시 통신망(`Interface__c`)과 SOAR를 연동하고 싶을 때 확장용으로 쓰기 위한 하위 호환성(Legacy) 목적으로만 남겨둡니다.
+* @Deprecated        : (SOAR 패키지 관점) Tier 2 Flyweight 패턴 도입으로 인하여 SOAR 코어 프레임워크에서는 폐기되었습니다.
+*                      [중요] 이 클래스는 SOAR 독립 관리형 패키지(Managed Package) 빌드 시 **절대 포함되어서는 안 됩니다.** 
+*                      사내망 레거시 통신을 위해 패키지 외부(Local Org)에서 확장 구현하는 '언매니지드(Unmanaged) 확장 샘플'로만 존재합니다.
 */
 public with sharing class SecurityInterfaceBridge {
 
