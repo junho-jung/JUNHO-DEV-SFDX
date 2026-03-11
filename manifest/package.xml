@@ -123,6 +123,8 @@
         <members>SecurityThrottleFilter</members>
         <members>SecurityMetadataRegistry</members>
         <members>SecurityBaseWebhookAction</members>
+        <members>SecurityTeamsPayloadBuilder</members>
+        <members>SecurityNotifyTeamsLegacyAction</members>
         <name>ApexClass</name>
     </types>
     <types>
