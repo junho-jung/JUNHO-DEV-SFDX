@@ -22,21 +22,14 @@ public class SecurityActionFactory {
         String formattedType = actionType.trim().toUpperCase();
 
         try {
-            List<SecurityInboundAction__mdt> mappings = [
-                SELECT ActionClassName__c, ExecutionMode__c
-                FROM SecurityInboundAction__mdt 
-                WHERE InboundActionType__c = :formattedType 
-                LIMIT 1
-            ];
+            SecurityInboundAction__mdt mapping = SecurityMetadataRegistry.getInstance().getInboundAction(formattedType);
 
-            if (mappings.isEmpty()) {
+            if (mapping == null) {
                 SecuritySoarTrace.log('SecurityActionFactory.getAction.unknown_action', new Map<String, Object>{
                     'actionType' => formattedType
                 });
                 return null;
             }
-
-            SecurityInboundAction__mdt mapping = mappings[0];
 
             // 리플렉션(Reflection)을 통한 동적 인스턴스 생성
             Type t = Type.forName(mapping.ActionClassName__c);
