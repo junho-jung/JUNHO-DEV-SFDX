@@ -4,7 +4,7 @@
     <protected>false</protected>
     <values>
         <field>ActionCritical__c</field>
-        <value xsi:type="xsd:string">REVOKE_TOKEN,NOTIFY_TEAMS</value>
+        <value xsi:type="xsd:string">REVOKE_TOKEN;NOTIFY_TEAMS</value>
     </values>
     <values>
         <field>ActionHigh__c</field>

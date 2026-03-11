@@ -4,7 +4,7 @@
     <protected>false</protected>
     <values>
         <field>ActionMedium__c</field>
-        <value xsi:type="xsd:string">LOG_ONLY,NOTIFY_SLACK</value>
+        <value xsi:type="xsd:string">LOG_ONLY;NOTIFY_SLACK</value>
     </values>
     <values>
         <field>IsActive__c</field>
