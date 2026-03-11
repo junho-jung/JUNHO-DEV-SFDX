@@ -11,7 +11,6 @@ global with sharing class EM_SecurityBlockInterceptor extends SecurityBaseInterc
     private final Decimal MAX_RECORD = 100;
 
     global override InterceptorResult doEvaluate(SObject event, User user) {
-    global override InterceptorResult doEvaluate(SObject event, User user) {
         String policyCode = null;
         String severity = 'CRITICAL';
 
