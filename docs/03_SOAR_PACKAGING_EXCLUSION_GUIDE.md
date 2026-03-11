@@ -130,3 +130,62 @@ public with sharing class MyLegacyCustomAction extends SecurityBaseAction {
     }
 }
 ```
+
+### 3. [참고] 내부 로직 전용 액션 vs 커스텀 외부 콜아웃 연동 액션 포맷 비교
+SOAR 패키지를 설치한 후 고객사가 자유롭게 커스텀 액션을 추가할 때 지켜야 하는 **템플릿(포맷) 가이드**입니다. SFDC 내부 데이터만 조작하느냐, 외부 통신을 동반하느냐에 따라 템플릿과 실행 모드가 다릅니다.
+
+#### A. 내부 로직 전용 액션 (Internal SFDC Logic)
+* **특징:** SFDC 레코드 수정, 권한 회수, 프로필 변경 등 트랜잭션 내에서 즉시 완료되는 작업입니다.
+* **메타데이터 설정 (\SecurityInboundAction__mdt\):** \ExecutionMode__c\를 **\SYNC\ (권장) 또는 \ASYNC\** 로 설정.
+
+``apex
+/**
+ * [내부 로직 전용 액션 포맷]
+ * 외부 통신이 없으므로 Webhook 베이스가 아닌 가장 근본이 되는 BaseAction을 상속합니다.
+ */
+public class MyInternalCustomAction extends SecurityBaseAction {
+    
+    // 이 오버라이드 메서드에 원하는 로직을 작성합니다.
+    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+        
+        // Ex) 추출된 Target 유저의 권한셋을 회수하거나 레코드를 업데이트
+        if (String.isNotBlank(targetUserId)) {
+            User u = [SELECT Id, IsActive FROM User WHERE Id = :targetUserId LIMIT 1];
+            u.IsActive = false;
+            update u;
+        }
+        
+    }
+}
+``
+
+#### B. 커스텀 외부 콜아웃 연동 액션 (External Custom Callout Logic)
+* **특징:** 표준 웹훅 방식(위 1번 FAQ)만으로는 부족할 때, 즉 커스텀 인증 헤더나 복잡한 전처리 로직이 필요한 외부 API 등을 직접 연동할 때 사용합니다.
+* **메타데이터 설정 (\SecurityInboundAction__mdt\):** \ExecutionMode__c\를 **반드시 \ASYNC\** 로 설정! (SFDC는 Trigger 트랜잭션 내부에서 실시간 Callout을 막기 때문입니다.)
+
+``apex
+/**
+ * [커스텀 콜아웃 연동 액션 포맷]
+ * 커스텀 통신이 목적이므로 BaseWebhookAction 대신 BaseAction을 상속받아 HTTP 콜아웃을 직접 구현합니다.
+ */
+public class MyExternalCustomAction extends SecurityBaseAction {
+    
+    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+        
+        // 1. 여기서 추출된 데이터를 바탕으로 복잡한 외부 전송용 JSON Payload 조립
+        String customJsonBody = '{ "user": "' + targetUserId + '", "alert": "High Risk Event" }';
+        
+        // 2. 외부 Callout 진행 (이 코드는 이미 ASYNC 큐에이블 안에서 실행 중이므로 Callout 에러가 나지 않음)
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('callout:MyCustomLegacyAPI');
+        req.setMethod('POST');
+        req.setBody(customJsonBody);
+        
+        Http http = new Http();
+        HttpResponse res = http.send(req);
+        
+        // (참고) 만약 레거시 브릿지를 연동할거라면 위 HTTP 코드를 전부 지우고 아래 호출만 쓰면 됩니다.
+        // SecurityInterfaceBridge.callForAction('LEGACY_ALERT', originalPayloadJson);
+    }
+}
+``
