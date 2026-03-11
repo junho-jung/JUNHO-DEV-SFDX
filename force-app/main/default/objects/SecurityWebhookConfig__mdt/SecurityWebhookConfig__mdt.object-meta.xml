@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>SOAR 패키지 전용 아웃바운드 Webhook 엔드포인트 설정 (Slack, Teams 등)</description>
+    <label>SecurityWebhookConfig</label>
+    <pluralLabel>SecurityWebhookConfigs</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

@@ -20,25 +20,25 @@ public virtual class SecurityBaseWebhookAction extends SecurityBaseAction {
         String actionType = getActionType();
         
         // 1. 메타데이터에서 연동 설정 가져오기
-        List<SecurityIntegration__mdt> integrations = [
-            SELECT InterfaceId__c, IsActive__c 
-            FROM SecurityIntegration__mdt 
+        List<SecurityWebhookConfig__mdt> configs = [
+            SELECT Endpoint__c, IsActive__c 
+            FROM SecurityWebhookConfig__mdt 
             WHERE ActionType__c = :actionType AND IsActive__c = true
             LIMIT 1
         ];
 
-        if (integrations.isEmpty()) {
+        if (configs.isEmpty()) {
             SecuritySoarTrace.log('SecurityBaseWebhookAction.doExecute.Skipped', new Map<String, Object>{
-                'reason' => 'No active SecurityIntegration__mdt found for ' + actionType
+                'reason' => 'No active SecurityWebhookConfig__mdt found for ' + actionType
             });
             return;
         }
 
-        String endpointConfig = integrations[0].InterfaceId__c; // 이제는 Named Credential Name 이나 URL 로 사용됨
+        String endpointConfig = configs[0].Endpoint__c; // 이제는 Named Credential Name 이나 URL 로 사용됨
 
         if (String.isBlank(endpointConfig)) {
             SecuritySoarTrace.log('SecurityBaseWebhookAction.doExecute.Error', new Map<String, Object>{
-                'reason' => 'InterfaceId__c is empty for ' + actionType
+                'reason' => 'Endpoint__c is empty for ' + actionType
             });
             return;
         }
