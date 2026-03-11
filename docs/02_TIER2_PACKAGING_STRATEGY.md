@@ -43,3 +43,71 @@
 * **Date:** 2026-03-11
 * **Author:** jh.jung (AI Assisted)
 * **Status:** Tier 2 Refactoring Completed. Ready for independent managed package evaluation.
+
+---
+
+## 🧪 테스트 가이드 (How to Test)
+Tier 2 리팩토링으로 적용된 3가지 핵심 패턴이 정상 작동하는지 검증하기 위한 가이드입니다.
+
+### 1. 퍼사드 패턴 (Facade) 검증
+* **테스트 목적:** `SecurityGuard`의 이벤트별 분리된 파사드 메서드들이 기존과 동일하게 위협을 정확히 차단/감지하는지 확인합니다.
+* **실행 방법:**
+  1. (Block) 일반 사용자로 로그인하여 `Account` 등 주요 오브젝트에서 100건 이상의 데이터를 Dataloader나 API로 요청합니다. (NIGHT_API_HEIST 또는 MASS_DATA_EXPORT 정책 발동 여부 확인)
+  2. (Monitor) 보안 대상이 아닌 일반 보고서를 조회하거나, 토큰 재사용 의심 상황을 연출합니다.
+  3. `SecurityActionLog__c` 레코드가 정상 생성되고, `SecurityGuard`가 평가한 등급(CRITICAL/HIGH/LOW)이 정확히 매핑되었는지 확인합니다.
+
+### 2. 싱글톤 패턴 (Singleton) 검증
+* **테스트 목적:** `SecurityMetadataRegistry`가 메타데이터 쿼리를 메모리에 올바르게 캐싱하여 추가적인 SOQL Limits를 소모하지 않는지 확인합니다.
+* **실행 방법:**
+  1. 익명 Apex 창(Developer Console)에서 이벤트를 3~5회 연속으로 발행하는 스크립트를 실행합니다.
+  2. `System.Limits.getQueries()` 로그를 추적하여, 이벤트 개수와 무관하게 `SecurityPolicy__mdt` 및 `SecurityInboundAction__mdt`에 대한 쿼리가 트랜잭션당 단 **1회**만 발생했는지 검증합니다.
+
+### 3. 플라이웨이트 패턴 (Flyweight) 검증
+* **테스트 목적:** 기존 `Interface__c`를 제거한 웹훅 액션이 표준 `HttpRequest` 및 `Named Credentials`를 통해 정상적으로 알림을 발송하는지 확인합니다.
+* **실행 방법:**
+  1. `SecurityIntegration__mdt` 리스트에서 ActionType이 `NOTIFY_SLACK` 혹은 `NOTIFY_TEAMS`인 레코드의 `InterfaceId__c` 필드에 유효한 콜아웃 주소(예: `callout:MySlackWebhookCore` 또는 직접적인 HTTPS URL)를 입력합니다.
+  2. 고위험(CRITICAL) 보안 이벤트를 강제로 발생시킵니다 (예: 권한 상승 목적의 SOQL 실행).
+  3. 실제 Slack/Teams 채널로 경보 메시지가 수신되는지 확인합니다.
+  4. 만약 실패하더라도 `SecuritySoarTrace` 객체나 Apex Debug Log에서 HTTP Status Code와 Response 내용을 확인하여 오류를 추적할 수 있습니다.
+### 4. 종합 테스트 스크립트 (Anonymous Apex)
+Developer Console의 Anonymous Window 창에 아래 코드를 복사해서 실행하면, 한 번의 트랜잭션으로 위의 3가지 패턴이 모두 정상 동작하는지 테스트할 수 있습니다. 정상 동작할 경우, `SecurityActionLog__c` 레코드 생성과 함께 설정된 외부 시스템(Slack/Teams)으로 알림 전송이 시도됩니다.
+
+```apex
+// 1. 임의의 심각도 높은 ApiEvent 모의 생성 (NIGHT_API_HEIST / PRIVILEGE_ESCALATION 유도)
+ApiEvent mockEvent = new ApiEvent(
+    Query = 'SELECT Id, Password FROM User', 
+    RowsProcessed = 500,
+    SourceIp = '1.2.3.4',
+    Client = 'Postman'
+);
+
+// 2. 현재 로그인된 유저 정보 로드
+User currentUser = [SELECT Id, Name, Email, Profile.Name FROM User WHERE Id = :UserInfo.getUserId() LIMIT 1];
+
+// 3. Facade 패턴이 적용된 Publisher 호출 (내부적으로 SecurityGuard의 analyzeApiEvent가 발동됨)
+// 3-1. 첫 번째 시도 (싱글톤 레지스트리에 의해 메타데이터가 메모리에 로드됨)
+System.debug('=== First Call (Metadata Initialization) ===');
+Integer queriesBefore = Limits.getQueries();
+SecurityAlertPublisher.publish(
+    'EM_SecurityBlockInterceptor', // Source
+    'PRIVILEGE_ESCALATION',        // PolicyCode
+    'CRITICAL',                    // Severity
+    'NOTIFY_SLACK',                // ActionType (Flyweight 웹훅 액션이 트리거됨)
+    mockEvent,                     // Raw Event
+    currentUser                    // Target User
+);
+System.debug('Queries used: ' + (Limits.getQueries() - queriesBefore));
+
+// 3-2. 두 번째 시도 (동일 트랜잭션 - 캐시 히트 검증)
+System.debug('=== Second Call (Cache Hit Expected) ===');
+queriesBefore = Limits.getQueries();
+SecurityAlertPublisher.publish(
+    'EM_SecurityBlockInterceptor',
+    'NIGHT_API_HEIST',
+    'HIGH',
+    'NOTIFY_TEAMS',               // ActionType
+    mockEvent,
+    currentUser
+);
+System.debug('Queries used (Should be significantly lower/zero): ' + (Limits.getQueries() - queriesBefore));
+```
