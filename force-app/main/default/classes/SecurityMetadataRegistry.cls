@@ -58,7 +58,7 @@ public with sharing class SecurityMetadataRegistry {
         for (SecurityPolicy__mdt p : [
             SELECT Id, PolicyCode__c, IsActive__c, ActionTypes__c, ActionButtons__c,
                    ThresholdLow__c, ActionLow__c, ThresholdMedium__c, ActionMedium__c, 
-                   ThresholdCritical__c, ActionCritical__c
+                   ThresholdHigh__c, ActionHigh__c, ThresholdCritical__c, ActionCritical__c
             FROM SecurityPolicy__mdt
             WHERE IsActive__c = true
         ]) {

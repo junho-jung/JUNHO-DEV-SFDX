@@ -303,6 +303,7 @@
         <members>SecurityIntegration__mdt.Mode__c</members>
         <members>SecurityPolicy__mdt.ActionButtons__c</members>
         <members>SecurityPolicy__mdt.ActionCritical__c</members>
+        <members>SecurityPolicy__mdt.ActionHigh__c</members>
         <members>SecurityPolicy__mdt.ActionLow__c</members>
         <members>SecurityPolicy__mdt.ActionMedium__c</members>
         <members>SecurityPolicy__mdt.ActionTypes__c</members>
@@ -310,6 +311,7 @@
         <members>SecurityPolicy__mdt.PolicyCode__c</members>
         <members>SecurityPolicy__mdt.Severity__c</members>
         <members>SecurityPolicy__mdt.ThresholdCritical__c</members>
+        <members>SecurityPolicy__mdt.ThresholdHigh__c</members>
         <members>SecurityPolicy__mdt.ThresholdLow__c</members>
         <members>SecurityPolicy__mdt.ThresholdMedium__c</members>
         <members>Setting__c.IsTriggerActive__c</members>
@@ -366,8 +368,8 @@
         <members>SecurityPolicy.SUSPICIOUS_IP_ACCESS</members>
         <members>SecurityPolicy.VIP_DATA_ACCESS</members>
         <members>SecurityPolicy.WEEKEND_REPORT_ACCESS</members>
-        <members>SecurityIntegration.NOTIFY_SLACK</members>
-        <members>SecurityIntegration.NOTIFY_TEAMS</members>
+        <members>SecurityWebhookConfig.NOTIFY_SLACK</members>
+        <members>SecurityWebhookConfig.NOTIFY_TEAMS</members>
         <name>CustomMetadata</name>
     </types>
     <types>
@@ -393,6 +395,7 @@
         <members>Setting__c</members>
         <members>TriggerHandlerSetting__mdt</members>
         <members>TriggerHandler__mdt</members>
+        <members>SecurityWebhookConfig__mdt</members>
         <name>CustomObject</name>
     </types>
     <types>

@@ -438,7 +438,7 @@ public with sharing class SecurityGuard {
             SecurityPolicy__mdt policy = [
                 SELECT Id, PolicyCode__c, IsActive__c, ActionTypes__c, ActionButtons__c,
                        ThresholdLow__c, ActionLow__c, ThresholdMedium__c, ActionMedium__c, 
-                       ThresholdCritical__c, ActionCritical__c
+                       ThresholdHigh__c, ActionHigh__c, ThresholdCritical__c, ActionCritical__c
                 FROM SecurityPolicy__mdt
                 WHERE PolicyCode__c = :policyCode AND IsActive__c = true
                 LIMIT 1

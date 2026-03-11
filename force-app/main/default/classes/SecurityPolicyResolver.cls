@@ -22,6 +22,8 @@ public with sharing class SecurityPolicyResolver {
                     if (policy.ThresholdCritical__c != null && alertCount >= policy.ThresholdCritical__c && !String.isBlank(policy.ActionCritical__c)) {
                         mergedTypes.addAll(policy.ActionCritical__c.split(';'));
                         matchedDynamic = true;
+                    } else if (policy.ThresholdHigh__c != null && alertCount >= policy.ThresholdHigh__c && !String.isBlank(policy.ActionHigh__c)) {
+                        mergedTypes.addAll(policy.ActionHigh__c.split(';'));
                     } else if (policy.ThresholdMedium__c != null && alertCount >= policy.ThresholdMedium__c && !String.isBlank(policy.ActionMedium__c)) {
                         mergedTypes.addAll(policy.ActionMedium__c.split(';'));
                         matchedDynamic = true;
