@@ -37,6 +37,10 @@
     *   `ReportEventExtractor`, `ApiEventExtractor`, `LoginEventExtractor`, `DefaultEventExtractor` 4종의 단일 책임 클래스 구축 완료.
 *   **효과**: 향후 Salesforce 릴리즈에 의해 새로운 트랜잭션 이벤트(예: `ListViewEvent` 등)가 새롭게 감지 대상에 포함되더라도 메인 Publisher 코드는 건드리지 않고 **새로운 Extractor 클래스 하나만 추가**하면 완벽히 대응됩니다.
 
+> 🚀 **확장 시뮬레이션 (Event Monitoring Coverage):**  
+> 이번 Strategy Pattern 도입으로 인해 Salesforce Event Monitoring에서 제공하는 전체 트랜잭션 이벤트(예: `ListViewEvent`, `LightningUriEvent`, `DocumentAttachmentDownloads` 등)를 방어 범위에 추가하는 것이 매우 간단해졌습니다.
+> 새로운 SObject 감지가 필요하다면, 기존 코드를 전혀 수정하지 않고 오직 **`IEventExtractor`를 구현한 신규 클래스 하나를 추가 생성**한 뒤, Publisher의 `extractors` Map 초기화 부분에 단 한 줄짜리 매핑(`ListViewEvent.SObjectType => new ListViewEventExtractor()`)만 끼워 넣으면 프레임워크가 완벽하게 확장됩니다.
+
 ---
 
 > 💡 **다음 단계 (Next Steps):** Tier 1 작업이 성공적으로 컴파일됨에 따라, 구조적 기술 부채를 완전히 덜어내기 위한 **Tier 2 (퍼사드 분할, 메타데이터 레지스트리, 웹훅 액션 통폐합)** 작업으로 이행할 준비가 완료되었습니다.
@@ -54,17 +58,18 @@ Tier 1 리팩토링으로 개선된 프레임워크 코어를 Salesforce Org 환
 2.  아래 코드를 복사해서 실행(`Execute`)합니다.
 ```apex
 // 1. FREEZE_USER 액션이 메타데이터 기반으로 잘 생성되는지 테스트
-ISecurityAction freezeAction = SecurityActionFactory.createAction('FREEZE_USER');
-System.debug('Freeze Action 생성 여부: ' + (freezeAction != null));
+SecurityTypes.ActionDescriptor freezeDesc = SecurityActionFactory.getAction('FREEZE_USER');
+System.debug('ActionDescriptor 생성 여부: ' + (freezeDesc != null));
 
 // 2. 클래스 타입이 맞게 캐스팅 되었는지 확인
-System.debug('클래스 타입 매칭: ' + (freezeAction instanceof SecurityFreezeUserAction));
+System.debug('클래스 타입 매칭: ' + (freezeDesc.action instanceof SecurityFreezeUserAction));
 
 // 3. ExecutionMode가 메타데이터의 설정대로 SYNC를 반환하는지 테스트
-System.debug('실행 모드 (예상값 SYNC): ' + SecurityActionFactory.getExecutionMode('FREEZE_USER'));
+System.debug('실행 모드 (예상값 SYNC): ' + freezeDesc.mode);
 
 // 4. 슬랙 알림 같은 비동기 액션 테스트
-System.debug('비동기 실행 모드 (예상값 ASYNC): ' + SecurityActionFactory.getExecutionMode('NOTIFY_SLACK'));
+SecurityTypes.ActionDescriptor slackDesc = SecurityActionFactory.getAction('NOTIFY_SLACK');
+System.debug('비동기 실행 모드 (예상값 ASYNC): ' + slackDesc.mode);
 ```
 **[기대 결과]:** 코드 수정 없이 `SecurityInboundAction__mdt` 메타데이터에 등록된 정보를 바탕으로 클래스가 인스턴스화 되고, SYNC/ASYNC 모드를 읽어오는 로그가 보이면 성공입니다.
 
@@ -84,8 +89,7 @@ for(Integer i = 0; i < 20; i++) {
         Source__c = 'TEST',
         PolicyCode__c = 'NIGHT_MASS_API', 
         Severity__c = 'Medium',
-        UserId__c = UserInfo.getUserId(),
-        ActionTypes__c = 'NOTIFY_SLACK'
+        UserId__c = UserInfo.getUserId()
     ));
 }
 
@@ -101,14 +105,17 @@ EventBus.publish(testAlerts);
 ```apex
 // A. ApiEvent 타입 테스트
 ApiEvent apiEvt = new ApiEvent(
-    QueriedEntities = 'Account, Contact',
-    Client = 'Postman'
+        QueriedEntities = 'Account, Contact',
+        Client = 'Postman'
 );
-SecurityAlert__e alert1 = SecurityAlertPublisher.publish(
-    'NIGHT_MASS_API', 'High', 'TEST_API', apiEvt, null, 'API_ABUSE_DETECTED'
+SecurityAlertPublisher.publish(
+        'ConsoleTest',
+        'NIGHT_MASS_API', 
+        'High', 
+        '',
+        apiEvt, 
+        new User()
 );
-System.debug('API Event ResourceInfo: ' + alert1.ResourceId__c + ' / ' + alert1.ResourceName__c);
-
 
 // B. ReportEvent 타입 테스트
 // (주의: Org에 Report가 하나 이상 존재해야 합니다.)
@@ -117,9 +124,13 @@ ReportEvent repEvt = new ReportEvent(
     ReportId = testReport.Id,
     Operation = 'ReportExported'
 );
-SecurityAlert__e alert2 = SecurityAlertPublisher.publish(
-    'DATA_EXPORT', 'Critical', 'TEST_REP', repEvt, null, 'MASS_EXPORT_DETECTED'
+SecurityAlertPublisher.publish(
+    'ConsoleTest',
+    'DATA_EXPORT', 
+    'Critical', 
+    '',
+    repEvt, 
+    new User()
 );
-System.debug('Report Event ResourceInfo: ' + alert2.ResourceId__c + ' / ' + alert2.ResourceName__c);
 ```
-**[기대 결과]:** `publish` 내부의 `instanceof` 분기문이 완전히 사라졌음에도 불구하고, A 케이스에서는 `ApiEventExtractor`가, B 케이스에서는 `ReportEventExtractor`가 정확히 매핑되어 로그상에 Api 이벤트의 리소스 정보(`QueriedEntities`)와 Report 이벤트의 이름(`Name`)이 올바르게 추출되어 Platform Event 객체에 담겨야 합니다.
+**[기대 결과]:** `publish` 내부의 `instanceof` 분기문이 완전히 사라졌음에도 불구하고, A 케이스에서는 `ApiEventExtractor`가, B 케이스에서는 `ReportEventExtractor`가 정확히 매핑되어 `SecuritySoarTrace` 로그 혹은 `EventBus` 발행 로그상에 Api 이벤트의 리소스 정보(`QueriedEntities`)와 Report 이벤트의 이름(`Name`)이 올바르게 추출되어 Platform Event 객체 페이로드에 정상적으로 담기는 것을 확인하면 완벽합니다.
