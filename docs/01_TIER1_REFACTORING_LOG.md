@@ -52,10 +52,12 @@
 Tier 1 리팩토링으로 개선된 프레임워크 코어를 Salesforce Org 환경에서 직접 테스트하고 검증하시려면 다음 3가지 핵심 기능(Reflection, Chain of Responsibility, Strategy)이 정상 동작하는지 확인하시면 됩니다.
 
 ### ✅ 1. Factory의 Reflection 동적 인스턴스화 테스트 (`SecurityActionFactory`)
-가장 먼저, 문자열(String) 이름만으로 클래스가 정상적으로 생성되고 모드(SYNC/ASYNC)가 올바르게 반환되는지 확인합니다.
+* **테스트 목적:** 문자열 이름만으로 정상적으로 클래스가 인스턴스화되고, 메타데이터에 정의된 실행 모드(SYNC/ASYNC)가 알맞게 반환되는지 확인합니다.
+* **기대 결과:** 익명 창 반환 로그(Debug Only)에 null이 아닌 객체가 생성되고, `SecurityFreezeUserAction` 매칭이 true로 나오며, 실행 모드가 각각 `SYNC`와 `ASYNC`로 출력되어야 정상입니다.
 
-1.  개발자 콘솔을 열고 `Debug` -> `Open Execute Anonymous Window`를 클릭합니다.
-2.  아래 코드를 복사해서 실행(`Execute`)합니다.
+**[종합 테스트 스크립트 (Anonymous Apex)]**
+1. 개발자 콘솔을 열고 `Debug` -> `Open Execute Anonymous Window`를 클릭합니다.
+2. 아래 코드를 복사해서 실행(`Execute`)합니다.
 ```apex
 // 1. FREEZE_USER 액션이 메타데이터 기반으로 잘 생성되는지 테스트
 SecurityTypes.ActionDescriptor freezeDesc = SecurityActionFactory.getAction('FREEZE_USER');
@@ -67,21 +69,20 @@ System.debug('클래스 타입 매칭: ' + (freezeDesc.action instanceof Securit
 // 3. ExecutionMode가 메타데이터의 설정대로 SYNC를 반환하는지 테스트
 System.debug('실행 모드 (예상값 SYNC): ' + freezeDesc.mode);
 
-// 4. 슬랙 알림 같은 비동기 액션 테스트
+// 4. 비동기 액션 테스트
 SecurityTypes.ActionDescriptor slackDesc = SecurityActionFactory.getAction('NOTIFY_SLACK');
 System.debug('비동기 실행 모드 (예상값 ASYNC): ' + slackDesc.mode);
 ```
-**[기대 결과]:** 코드 수정 없이 `SecurityInboundAction__mdt` 메타데이터에 등록된 정보를 바탕으로 클래스가 인스턴스화 되고, SYNC/ASYNC 모드를 읽어오는 로그가 보이면 성공입니다.
 
 ### ✅ 2. Handler의 서킷 브레이커 & 필터 체인 테스트 (`SecurityAlertHandler`)
-방어 로직(Throttling)이 체인 형태로 잘 작동하여 과도한 요청을 차단하는지 테스트합니다.
+* **테스트 목적:** 방어 로직(Throttling)이 체인 형태로 잘 작동하여 임계치를 초과하는 과도한 이벤트 유입을 차단하는지 테스트합니다.
+* **기대 결과:** SOAR 백그라운드 엔진 로그(`SecurityActionLog__c`)를 SOQL 쿼리로 조회(`SELECT Id, Status__c, Message__c FROM SecurityActionLog__c ORDER BY CreatedDate DESC`) 했을 때, 처음 N개는 정상적으로 액션이 실행되지만 임계치를 넘는 순간부터 이벤트가 차단되거나 로깅 시스템에 실패('THROTTLED' 등)가 기록되는 것이 확인되어야 합니다.
 
-1. 콘솔 익명 실행에 아래 코드를 세팅합니다.
-2. `SecurityInboundConfig.Default.ThrottleMaxPerMinute__c`에 설정된 제한 횟수(예: 분당 10회)보다 많은 수의 이벤트를 강제로 발생시킵니다.
+**[종합 테스트 스크립트 (Anonymous Apex)]**
 ```apex
 List<SecurityAlert__e> testAlerts = new List<SecurityAlert__e>();
 
-// 의도적으로 임계치 이상의 대량의 알럿을 동시에 버스에 태웁니다 (분당 10회 제한 초과 가정)
+// 의도적으로 임계치 이상의 대량의 알럿을 동시에 버스에 태웁니다 (분당 제한 초과 가정)
 // (주의: Org에 NIGHT_MASS_API 정책이 활성화되어 있어야 합니다.)
 for(Integer i = 0; i < 20; i++) {
     testAlerts.add(new SecurityAlert__e(
@@ -93,15 +94,16 @@ for(Integer i = 0; i < 20; i++) {
     ));
 }
 
-// 이벤트 발행 후 Handler가 작동할 것입니다.
+// 이벤트 발행 후 Handler 작동
 EventBus.publish(testAlerts);
+System.debug('Published 20 alerts. Check SecurityActionLog__c for throttled results.');
 ```
-**[기대 결과]:** SOAR 백그라운드 엔진 로그(`SecurityActionLog__c` 등)에서 처음 N개는 정상적으로 액션이 실행(또는 시도)되지만, 임계치를 넘는 순간 `SecurityThrottleFilter`가 개입하여 이벤트 페이로드가 차단되거나 로깅 시스템에 실패 로그가 기록되는 것이 확인되면 완벽합니다.
 
 ### ✅ 3. Publisher의 다형성 추출 전략 테스트 (`SecurityAlertPublisher`)
-이 작업이 가장 화려한 리팩토링(거대한 if문 제거) 결과입니다. 서로 다른 두 종류의 임의 이벤트를 던져보고, Publisher가 자동으로 알맞은 Extractor를 찾아 데이터를 파싱하는지 확인합니다.
+* **테스트 목적:** 거대한 `if-else`/`instanceof` 로직이 완벽히 분리되었으며, 서로 다른 SObject 타입(ApiEvent, ReportEvent)에 대해 자동으로 적절한 Extractor 클래스가 실행되는지 확인합니다.
+* **기대 결과:** 쿼리로 `SELECT EventKey__c, Payload__c FROM SecurityAlert__e`를 조회했을 때, Payload JSON 문자열 안에 Api 이벤트는 `QueriedEntities`('Account, Contact') 이메시지를, Report 이벤트는 보고서의 `Name` 데이터를 정상적으로 담고 있어야 합니다.
 
-1. 콘솔 익명 실행에 아래 코드를 입력합니다.
+**[종합 테스트 스크립트 (Anonymous Apex)]**
 ```apex
 // A. ApiEvent 타입 테스트
 ApiEvent apiEvt = new ApiEvent(
@@ -118,7 +120,7 @@ SecurityAlertPublisher.publish(
 );
 
 // B. ReportEvent 타입 테스트
-// (주의: Org에 Report가 하나 이상 존재해야 합니다.)
+// (주의: Org에 Report가 최소 하나 이상 존재해야 합니다.)
 Report testReport = [SELECT Id, Name FROM Report LIMIT 1];
 ReportEvent repEvt = new ReportEvent(
     ReportId = testReport.Id,
@@ -132,5 +134,5 @@ SecurityAlertPublisher.publish(
     repEvt, 
     new User()
 );
+System.debug('Platform events published successfully bypassing all instanceof code branches.');
 ```
-**[기대 결과]:** `publish` 내부의 `instanceof` 분기문이 완전히 사라졌음에도 불구하고, A 케이스에서는 `ApiEventExtractor`가, B 케이스에서는 `ReportEventExtractor`가 정확히 매핑되어 `SecuritySoarTrace` 로그 혹은 `EventBus` 발행 로그상에 Api 이벤트의 리소스 정보(`QueriedEntities`)와 Report 이벤트의 이름(`Name`)이 올바르게 추출되어 Platform Event 객체 페이로드에 정상적으로 담기는 것을 확인하면 완벽합니다.
