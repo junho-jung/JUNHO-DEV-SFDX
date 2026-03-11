@@ -11,36 +11,38 @@
 ### ① 이벤트 캡처 단계 (Event Detection)
 Transaction Security가 발동할 때 동기적(Synchronous)으로 수행되는 가장 앞단의 방어벽입니다. 이 단계는 트랜잭션 처리량 제약사항으로 비동기 호출이나 DML이 제한됩니다.
 
-* **1-1. `BaseInterceptor.evaluate(SObject event)`**
+* **1-1. `SecurityBaseInterceptor.evaluate(SObject event)`**
   * Salesforce의 EventCondition이 트리거되면 최초로 호출됩니다.
-  * 내부적으로 `EM_***Interceptor` 들의 패턴 순회(`doEvaluate()`)를 반복합니다.
-* **1-2. `EM_SecurityBlockInterceptor.doEvaluate(event, user)`**
-  * `SecurityGuard.isPrivilegeEscalation(query)` 등 세부 유틸리티를 호출하여 쿼리를 텍스트 기반으로 분석하거나 Report 사이즈를 계산합니다.
+  * 이벤트 유형에 따라 내부적으로 `SecurityGuard`의 특정 Facade 메서드(`analyzeApiEvent`, `analyzeReportEvent` 등)로 델리게이팅(위임)합니다.
+* **1-2. `SecurityGuard` (Facade Pattern) 및 `EM_SecurityBlockInterceptor`**
+  * 분할된 `SecurityGuard` 메서드가 `EM_***Interceptor`를 순회하며 텍스트 쿼리 규칙 등을 분석합니다.
   * 즉각 차단(Block) 조건 충족 시 `InterceptorResult('PRIVILEGE_ESCALATION', 'CRITICAL')`를 리턴합니다.
 * **1-3. `SecurityAlertPublisher.publish(String policyCode, ...)`**
-  * 인터셉터 내부적인 Callout 블록이나 DML 예외를 우회하기 위해 Platform Event(`SecurityAlert__e`)를 Fire(발행)합니다. 실제 SOAR 조치는 이 비동기 버스에 올라타면서 시작됩니다.
+  * DML이 금지된 인터셉터 런타임에서 벗어나기 위해 플랫폼 이벤트(`SecurityAlert__e`)를 비동기 버스에 발행합니다.
+  * **[신규]** 이때 `IEventExtractor` 전략 패턴(Strategy Pattern) 매핑 레이어가 개입하여, `ApiEvent`나 `ReportEvent` 등 각 SObject의 특성에 맞는 맞춤형 추출 전략으로 데이터를 JSON 직렬화합니다.
 
 ### ② 정책 판별 단계 (Policy & Orchestration)
 발행된 이벤트를 큐에서 꺼내어 분석하고 어떤 조치 파이프라인(Factory)을 태울지 결정합니다.
 
 * **2-1. `SecurityAlertHandler.processAlerts(List<SecurityAlert__e>)`**
-  * `SecurityAlert_tr` 트리거에서 리스트를 넘겨받아 배치로 평가 사이클을 개시합니다.
-* **2-2. `SecurityAlertHandler.executeActions(AlertRecord alert)`**
-  * `SecurityPolicy__mdt` 메타데이터를 쿼리하여 이벤트의 `PolicyCode__c`(예: `PRIVILEGE_ESCALATION`)와 일치하는 정책을 캐싱하고 매핑합니다.
-  * `SecurityActionThrottle.isThrottled(...)`를 호출하여 1분 내에 동일 유저/동일 조치가 한도(Threshold)를 넘지 않았는지 체크합니다. (무한 슬랙 알림 방어용 서킷 브레이커)
-* **2-3. `SecurityActionFactory.create(String actionType)`**
-  * 정책에 맵핑된 `ActionTypes__c`(예: `NOTIFY_SLACK,KILL_SESSION`) 문자열을 Parsing하여 루프를 돌며 `ISecurityAction` 인터페이스를 구현한 구체적 클래스의 인스턴스 배열을 동적 생성하여 반환합니다.
+  * `SecurityAlert_tr` 트리거에서 리스트를 넘겨받아 체인 오브 리스폰시빌리티(Chain of Responsibility) 기반의 검증기(Validator)들을 순회합니다.
+* **2-2. `SecurityMetadataRegistry` (Singleton)**
+  * 동일 트랜잭션 내에서 `SecurityPolicy__mdt` 메타데이터를 여러 번 SOQL 쿼리하지 않도록, `SecurityMetadataRegistry`가 캐싱된 정책 데이터를 제공하여 이벤트의 `PolicyCode__c`와 매핑합니다.
+  * `SecurityActionThrottle` 검증기가 1분 내에 동일 유저/조치가 한도(Threshold)를 넘지 않았는지 체크합니다. (무한 알림 방어용 서킷 브레이커)
+* **2-3. `SecurityActionFactory.create(String actionType)` (Reflection)**
+  * **[핵심]** 정책에 맵핑된 `ActionTypes__c`(예: `NOTIFY_TEAMS,KILL_SESSION`) 문자열을 Parsing합니다.
+  * 기존의 거대한 하드코딩 `switch`문을 폐기하고, **메타데이터(`SecurityInboundAction__mdt`)에 등록된 클래스 이름(String)을 읽어들여 `Type.forName().newInstance()` 인스턴스를 동적 생성 (리플렉션)** 하여 반환합니다.
 
 ### ③ 공통 액션 실행 단계 (Action Execution)
 오케스트레이터로부터 넘겨받은 액션 인스턴스 팩토리를 구동하고, 감사 로그(Audit Log)를 남깁니다.
 
 * **3-1. `SecurityActionExecutor.executeWithLogging(ISecurityAction action, String payload, Boolean isSync)`**
   * 모든 액션 실행을 조율하는 핵심 엔진입니다.
-  * `ISecurityAction.isAsync()` 결과값(어떤 액션이 Http Callout 등을 포함하는지)에 따라 동기 실행(`action.execute()`) 혹은 비동기 큐 대기(`SecurityActionExecutor.startAsyncContext()`) 상태로 라우팅을 분배합니다.
-* **3-2. `SecurityBaseAction.execute(String payloadJson)` & 내부 `doExecute()`**
-  * 모든 액션은 상속구조를 가지며 `BaseAction`의 템플릿 메서드 패턴(Template Method Pattern)에 의해 페이로드 파싱 등 보일러플레이트 코드 제어 후 하위 `doExecute()`를 호출합니다.
-  * **(예 1) 로컬 조치:** `SecurityKillSessionAction.doExecute()` 내부에서는 `AuthSession`을 쿼리하고 SessionId를 파기합니다. System 권한 실행을 요구할 수 있습니다.
-  * **(예 2) 외부 조치:** `SecurityNotifySlackAction.doExecute()` 내부에서는 `SecurityIntegration__mdt`를 뒤져 Endpoint를 찾고 Http Callout을 수행합니다.
+  * `ISecurityAction.isAsync()` 결과값(Callout 혹은 Async DML 유무)에 따라 동기 실행(`action.execute()`) 혹은 비동기 큐 대기(`SecurityActionExecutor.startAsyncContext()`) 상태로 라우팅을 분배합니다.
+* **3-2. `SecurityBaseAction` & `SecurityBaseWebhookAction` (Flyweight)**
+  * 모든 액션은 상속구조를 가지며 `BaseAction`의 템플릿 메서드 패턴(Template Method Pattern)에 의해 페이로드 파싱 등 보일러플레이트 제어 후 하위 `doExecute()`를 호출합니다.
+  * **(예 1) 내부 SFDC 로직:** `SecurityKillSessionAction.doExecute()` 내부에서는 `AuthSession`을 쿼리하고 SessionId를 파기합니다. System 권한 실행을 요구할 수 있습니다.
+  * **(예 2) 외부 알림 로직 (Flyweight 통신 뼈대):** `SecurityNotifyTeamsAction`은 **`SecurityBaseWebhookAction`** 을 상속받습니다. 이 베이스 클래스가 `SecurityWebhookConfig__mdt` 메타데이터의 Endpoint를 동적으로 뒤져 순수 Salesforce 표준 `HttpRequest` 객체 뼈대를 조립해 줍니다. 따라서 고객사는 사내 레거시 통신 모듈 종속성 없이 SOAR 단독으로 외부 알림 전송이 가능합니다.
 * **3-3. `SecuritySoarTrace.log(String location, String jsonData)`**
   * 각 Action이 끝날 때 성공/오류 메시지 등 전체 스택 트레이스를 `SecurityActionLog__c` 객체에 DML로 Insert 합니다.
 
