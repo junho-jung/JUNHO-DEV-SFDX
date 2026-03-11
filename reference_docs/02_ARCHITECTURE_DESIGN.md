@@ -40,7 +40,7 @@ graph TD
         Trig --> Hand[SecurityAlertHandler]
         
         Hand -->|Registry 캐싱| MDT_P[("SecurityMetadataRegistry\n(SecurityPolicy__mdt 등)")]
-        Hand -.->|Chain of Responsibility| Validator[Validators\n(Throttle, Mappings)]
+        Hand -.->|Chain of Responsibility| Validator["Validators\n(Throttle, Mappings)"]
     end
 
     Hand ==>|Type.forName| Fact(SecurityActionFactory)
