@@ -121,6 +121,8 @@
         <members>SecurityFilterChain</members>
         <members>SecurityPolicyResolver</members>
         <members>SecurityThrottleFilter</members>
+        <members>SecurityMetadataRegistry</members>
+        <members>SecurityBaseWebhookAction</members>
         <name>ApexClass</name>
     </types>
     <types>
@@ -347,6 +349,25 @@
         <members>SecurityInboundAction.RESTRICTPERMISSION</members>
         <members>SecurityInboundAction.REVOKEOAUTHTOKENS</members>
         <members>SecurityInboundAction.SENDTOSIEM</members>
+        <members>SecurityPolicy.NIGHT_API_HEIST</members>
+        <members>SecurityPolicy.PRIVILEGE_ESCALATION</members>
+        <members>SecurityInboundAction.LOG_ONLY</members>
+        <members>SecurityInboundAction.NOTIFY_MANAGER</members>
+        <members>SecurityInboundAction.NOTIFY_SLACK</members>
+        <members>SecurityInboundAction.NOTIFY_TEAMS</members>
+        <members>SecurityInboundAction.REQUIRE_MFA</members>
+        <members>SecurityInboundAction.REVOKE_TOKEN</members>
+        <members>SecurityPolicy.MASS_DATA_DELETION</members>
+        <members>SecurityPolicy.MASS_DATA_EXPORT</members>
+        <members>SecurityPolicy.REPORT_EXPORT_MFA</members>
+        <members>SecurityPolicy.SENSITIVE_DATA_VIEW</members>
+        <members>SecurityPolicy.STALE_TOKEN_USAGE</members>
+        <members>SecurityPolicy.SUSPICIOUS_BROWSER_MFA</members>
+        <members>SecurityPolicy.SUSPICIOUS_IP_ACCESS</members>
+        <members>SecurityPolicy.VIP_DATA_ACCESS</members>
+        <members>SecurityPolicy.WEEKEND_REPORT_ACCESS</members>
+        <members>SecurityIntegration.NOTIFY_SLACK</members>
+        <members>SecurityIntegration.NOTIFY_TEAMS</members>
         <name>CustomMetadata</name>
     </types>
     <types>
