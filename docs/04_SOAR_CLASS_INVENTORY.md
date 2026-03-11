@@ -110,14 +110,19 @@ Slack, Teams, SIEM(Splunk 등) 시스템과 외부로 통신하는 구체적인 
 | `SecuritySendToSiemAction`| Syslog 혹은 Splunk/Datadog HEC Endpoint로 원시 로그 포워딩 조치 | ✅ |
 | `SecurityNotifyManagerEmailAction`| 상위 관리자(Manager)에게 긴급 이메일 전문 발송 | ✅ |
 | `SecurityTeamsPayloadBuilder`| `SecurityEventContext.actionButtons`를 분석해 Teams 다이나믹 버튼 카드를 렌더링 | ✅ |
+| `SecurityNotifyUtil` | 비동기 알림 생성 및 팀즈/슬랙 발송을 위한 공통 콜백 발송 유틸리티 | ✅ |
 
 ---
 
-## 8. ↩️ 양방향 소통 채널 (Inbound Action Layer)
-Teams, Slack 등의 메신저에서 관리자가 "승인/차단/무시" 버튼을 눌렀을 때 응답을 받아 처리하는(Inbound) 관문입니다.
+## 8. ↩️ 양방향 소통 및 UI 채널 (Inbound & UI Channel Layer)
+Teams, Slack 등의 메신저에서 관리자가 "승인/차단" 버튼을 눌렀을 때 응답을 받거나, LWC 대시보드에서 수동으로 액션을 조작하는 관문(Gateway)입니다.
 
 | 클래스명 | 역할 및 책임 (SRP) | 패키징 |
 | :--- | :--- | :---: |
+| `SecurityDashboardController` | 관리자용 LWC 보안 대시보드 뷰를 제공하고 수동 방어 액션을 위임하는 API | ✅ |
+| `SecurityDemoController` | LWC 시뮬레이터에서 가상의 보안 이벤트를 강제로 발행하는 모의/데스트용 API | ✅ |
+| `IF_SecurityActionController` | Site(Guest)를 통해 외부 메신저 버튼 클릭(GET/POST)을 접수받는 REST 진입점 | ✅ |
+| `SecurityActionRequest_tr` | 대시보드나 외부 API가 발행한 `SecurityActionRequest__e` 이벤트의 실행 핸들러 | ✅ |
 | `IInboundAction` | 외부에서 들어오는 인바운드 페이로드를 처리하는 규격 | ✅ |
 | `SecurityInboundToken` | 외부 버튼 조작 시 해킹(위변조)을 막기 위한 JWT 서명/시크릿 검증 유틸 | ✅ |
 | `SecurityActionInboundHandler` | 외부 노출 Site URL을 통해 건너온 Payload를 안전하게 해독하고 내부 Action으로 Routing | ✅ |
