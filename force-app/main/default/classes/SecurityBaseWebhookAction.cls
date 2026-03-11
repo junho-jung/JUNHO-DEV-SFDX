@@ -16,6 +16,14 @@ public virtual class SecurityBaseWebhookAction extends SecurityBaseAction {
         return 'UNKNOWN_WEBHOOK';
     }
 
+    /**
+     * @description 서브 클래스에서 전송할 JSON Payload를 재정의할 수 있는 훅 메서드.
+     * 기본값은 원본 JSON을 그대로 전송합니다.
+     */
+    protected virtual String buildRequestBody(Map<String, Object> payloadMap, String originalPayloadJson) {
+        return originalPayloadJson;
+    }
+
     protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         String actionType = getActionType();
         
@@ -56,7 +64,7 @@ public virtual class SecurityBaseWebhookAction extends SecurityBaseAction {
         
         req.setMethod('POST');
         req.setHeader('Content-Type', 'application/json;charset=UTF-8');
-        req.setBody(originalPayloadJson);
+        req.setBody(buildRequestBody(payloadMap, originalPayloadJson));
 
         // 3. 발송 (Queueable 컨텍스트인 ActionExecutor 내부에서 실행되므로 안전함)
         Http http = new Http();
