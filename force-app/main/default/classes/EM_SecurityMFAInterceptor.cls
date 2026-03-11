@@ -17,34 +17,18 @@ global with sharing class EM_SecurityMFAInterceptor extends SecurityBaseIntercep
             return null;
         }
 
-        // [Scenario 9] 정체불명의 브라우저 접근 (The Unknown Device)
+        String policyCode = null;
+
         if (event instanceof ApiEvent) {
-            if (SecurityGuard.isSuspiciousClient(event)) {
-                return new InterceptorResult('SUSPICIOUS_BROWSER_MFA', 'HIGH');
-            }
+            policyCode = SecurityGuard.analyzeApiEvent((ApiEvent)event, user);
+        } else if (event instanceof ReportEvent) {
+            policyCode = SecurityGuard.analyzeReportEvent((ReportEvent)event, user);
+        } else if (event instanceof ListViewEvent) {
+            policyCode = SecurityGuard.analyzeListViewEvent((ListViewEvent)event, user);
         }
 
-        // [Scenario 2] VIP 민감 정보 스니핑 방어 (The VIP Sneak Peek)
-        // 리스트뷰 이름이나 보고서 이름에 '기밀', '임원' 등이 포함되어 있을 때 강제 MFA
-        if (event instanceof ListViewEvent) {
-            ListViewEvent lve = (ListViewEvent) event;
-            if (SecurityGuard.containsVIPSensitiveKeyword(lve.Name) || SecurityGuard.isSensitiveObject(lve.QueriedEntities)) {
-                return new InterceptorResult('VIP_DATA_ACCESS', 'HIGH'); // MFA 요구
-            }
-        }
-
-        if (event instanceof ReportEvent) {
-            ReportEvent re = (ReportEvent) event;
-            if (SecurityGuard.containsVIPSensitiveKeyword(re.Name)) {
-                return new InterceptorResult('VIP_DATA_ACCESS', 'HIGH'); // MFA 요구
-            }
-            
-            // 기존 유지 (일반적인 엑스포트는 MFA 요구 - 규모가 작을 경우)
-            Decimal rows = (Decimal)re.get('RowsProcessed');
-            Boolean isExport = (re.Operation != null && re.Operation.contains('Export'));
-            if (isExport && rows >= 100 && rows < 1000) {
-                return new InterceptorResult('REPORT_EXPORT_MFA', 'HIGH'); 
-            }
+        if (policyCode == 'SUSPICIOUS_BROWSER_MFA' || policyCode == 'VIP_DATA_ACCESS' || policyCode == 'REPORT_EXPORT_MFA') {
+            return new InterceptorResult(policyCode, 'HIGH');
         }
 
         return null;

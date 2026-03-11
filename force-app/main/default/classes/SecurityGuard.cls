@@ -12,6 +12,66 @@
 public with sharing class SecurityGuard {
 
     // =================================================================
+    // 1-A. Facade Pattern: 타입별 이벤트 분석 전담 메서드 (Tier 2)
+    // =================================================================
+
+    /**
+     * @description ApiEvent에 대한 모든 보안 룰을 평가하고 가장 적절한 정책 코드를 반환하는 퍼사드 메서드
+     */
+    public static String analyzeApiEvent(ApiEvent ae, User user) {
+        if (ae == null) return null;
+
+        String query = (ae.Query != null) ? ae.Query.toUpperCase() : '';
+        Decimal rows = (Decimal)ae.get('RowsProcessed');
+        String ip = ae.SourceIp;
+
+        // Block Interceptor Rules (CRITICAL/HIGH)
+        if (!isAdmin(user) && isPrivilegeEscalation(query)) return 'PRIVILEGE_ESCALATION';
+        if (isSuspiciousIP(ip)) return 'SUSPICIOUS_IP_ACCESS';
+        if (isMassDeletion(ae)) return 'MASS_DATA_DELETION';
+        if (rows > 100 && isOffHours()) return 'NIGHT_API_HEIST';
+
+        // MFA Interceptor Rules
+        if (isSuspiciousClient(ae) && isUserEnrolledInMFA(user?.Id)) return 'SUSPICIOUS_BROWSER_MFA';
+
+        // Monitor Interceptor Rules (LOW)
+        if (isStaleToken(user?.Id)) return 'STALE_TOKEN_USAGE';
+        if (containsSensitiveObject(query)) return 'SENSITIVE_DATA_VIEW';
+
+        return null; // 위반 사항 없음
+    }
+
+    /**
+     * @description ReportEvent에 대한 보안 룰 평가 퍼사드
+     */
+    public static String analyzeReportEvent(ReportEvent re, User user) {
+        if (re == null) return null;
+
+        Boolean isExport = (re.Operation != null && re.Operation.contains('Export'));
+        Decimal rows = (Decimal)re.get('RowsProcessed');
+
+        // Block & MFA Rules
+        if (isExport && rows >= 1000) return 'MASS_DATA_EXPORT';
+        if (isWeekend()) return 'WEEKEND_REPORT_ACCESS';
+        if (containsVIPSensitiveKeyword(re.Name)) return 'VIP_DATA_ACCESS'; // MFA Required
+        if (isExport && rows >= 100 && rows < 1000) return 'REPORT_EXPORT_MFA';
+
+        // Monitor Rules
+        return 'REPORT_MONITORING'; // 기본 로깅
+    }
+
+    /**
+     * @description ListViewEvent에 대한 보안 룰 평가 퍼사드
+     */
+    public static String analyzeListViewEvent(ListViewEvent lve, User user) {
+        if (lve == null) return null;
+        if (containsVIPSensitiveKeyword(lve.Name) || isSensitiveObject(lve.QueriedEntities)) {
+             return 'VIP_DATA_ACCESS';
+        }
+        return null;
+    }
+
+    // =================================================================
     // 1. 캐시 및 설정 관리
     // =================================================================
 
