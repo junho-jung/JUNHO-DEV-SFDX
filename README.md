@@ -76,8 +76,8 @@
 * **주요 내용**: 레파지토리를 외부(GitHub Public 등)에 공개하기 전, 하드코딩된 비밀번호나 내부망 엔드포인트, 민감한 개인정보가 소스 코드에 누출되었는지 검증한 감사 결과 및 조치 권고사항입니다.
 * **유용한 대상**: 오픈소스 메인테이너, 관리자
 
-#### [📦 13. 독립 프레임워크 추출 가이드 (Standalone Framework Extraction Guide)](reference_docs/13_FRAMEWORK_EXTRACTION_GUIDE.md)
-* **주요 내용**: 복합적인 비즈니스 로직(AccountController, PMS 등)이 섞어있는 현재 Org에서 순수하게 SOAR 코어 프레임워크만을 적출하여 새로운 클린 Org(SFDX)로 마이그레이션하기 위한 대상 파일 목록(Rename 규칙 포함)과 이관 절차입니다.
+#### [📦 13. 패키징 제외 대상 가이드 (AppExchange Packaging Exclusion Guide)](docs/03_SOAR_PACKAGING_EXCLUSION_GUIDE.md)
+* **주요 내용**: 복합적인 비즈니스 로직(AccountController, PMS 등)이 섞여있는 레거시 Org에서, 오직 순수 SOAR 코어 프레임워크만을 적출하여 새로운 클린 Org(SFDX)로 이전하고, 관리형 패키지로 만들 때 **반드시 제외해야 하는 사내 종속성(Interface__c 등)**을 명확히 정의한 문건입니다.
 * **유용한 대상**: 프레임워크 퍼블리싱 담당자, 시스템 아키텍트
 
 #### [🗺️ 14. 통합 구현 로드맵 및 작업 순서 (Implementation Roadmap)](reference_docs/14_IMPLEMENTATION_ROADMAP.md)
