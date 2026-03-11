@@ -1,7 +1,8 @@
 /**
 * @Author            : jh.jung
-* @Description       : Security 액션에서 Interface(RealTime/Queueable/Batch)를 간단히 호출하기 위한 브리지.
-*                      ActionType__c → SecurityIntegration__mdt → InterfaceConfig__mdt 를 통해 동적으로 라우팅한다.
+* @Description       : Security 액션에서 사내 자체 프레임워크인 Interface(RealTime/Queueable/Batch)를 호출하기 위한 브리지.
+* @Deprecated        : Tier 2 Flyweight 패턴 도입(`SecurityBaseWebhookAction`)으로 인해 SOAR의 핵심 웹훅 기능에서는 더 이상 이 브리지를 타지 않습니다.
+*                      고객사가 자체 레거시 통신망(`Interface__c`)과 SOAR를 연동하고 싶을 때 확장용으로 쓰기 위한 하위 호환성(Legacy) 목적으로만 남겨둡니다.
 */
 public with sharing class SecurityInterfaceBridge {
 
