@@ -112,6 +112,10 @@
 * **주요 내용**: 패키지에 포함되지 않는 도메인 인증(Named Credentials), 아웃바운드 허용(Remote Site Settings) 및 인바운드 웹훅 수신용 공개 포트(Public Site) 설정 가이드를 제공합니다.
 * **유용한 대상**: 시스템 관리자, 배포 스페셜리스트
 
+#### [🗂️ 21. SOAR 프레임워크 클래스 인벤토리 및 패키지 맵 (Class Inventory & Package Map)](reference_docs/21_SOAR_CLASS_INVENTORY.md)
+* **주요 내용**: 프레임워크를 구성하는 모든 Apex 클래스를 기능(Layer)별로 분류하고, 실제 트랜잭션의 실행 흐름(Execution Flow) 순으로 정렬하여 패키징 포함 여부(Include/Exclude)를 명확히 판별한 종합 인벤토리입니다.
+* **유용한 대상**: 전체 시스템 파악이 필요한 개발자, 패키징 배포 담당자, 테크 리드
+
 ---
 
 ## 🚀 빠른 시작 (Quick Start)
