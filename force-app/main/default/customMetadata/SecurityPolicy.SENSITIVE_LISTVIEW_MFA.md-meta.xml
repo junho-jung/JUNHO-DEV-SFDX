@@ -11,6 +11,10 @@
         <value xsi:nil="true"/>
     </values>
     <values>
+        <field>ActionHigh__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
         <field>ActionLow__c</field>
         <value xsi:nil="true"/>
     </values>
@@ -36,6 +40,10 @@
     </values>
     <values>
         <field>ThresholdCritical__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ThresholdHigh__c</field>
         <value xsi:nil="true"/>
     </values>
     <values>

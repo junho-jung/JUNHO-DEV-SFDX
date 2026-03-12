@@ -7,8 +7,16 @@
         <value xsi:type="xsd:string">SecurityKillSessionAction</value>
     </values>
     <values>
+        <field>ExecutionMode__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
         <field>InboundActionType__c</field>
         <value xsi:type="xsd:string">KILL_SESSION</value>
+    </values>
+    <values>
+        <field>IsActive__c</field>
+        <value xsi:type="xsd:boolean">false</value>
     </values>
     <values>
         <field>RequiresToken__c</field>

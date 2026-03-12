@@ -8,7 +8,6 @@
     </values>
     <values>
         <field>Endpoint__c</field>
-        <!-- 실제 운영에선 callout:TeamsWebhook 등 Named Credential을 권장합니다 -->
         <value xsi:type="xsd:string">callout:IF_Teams_Base</value>
     </values>
     <values>

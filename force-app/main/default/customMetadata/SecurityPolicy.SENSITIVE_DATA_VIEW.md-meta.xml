@@ -3,8 +3,28 @@
     <label>SENSITIVE_DATA_VIEW</label>
     <protected>false</protected>
     <values>
+        <field>ActionButtons__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ActionCritical__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ActionHigh__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ActionLow__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
         <field>ActionMedium__c</field>
         <value xsi:type="xsd:string">LOG_ONLY;NOTIFY_SLACK</value>
+    </values>
+    <values>
+        <field>ActionTypes__c</field>
+        <value xsi:nil="true"/>
     </values>
     <values>
         <field>IsActive__c</field>
@@ -15,7 +35,23 @@
         <value xsi:type="xsd:string">SENSITIVE_DATA_VIEW</value>
     </values>
     <values>
+        <field>Severity__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ThresholdCritical__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ThresholdHigh__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ThresholdLow__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
         <field>ThresholdMedium__c</field>
-        <value xsi:type="xsd:double">5</value>
+        <value xsi:type="xsd:double">5.0</value>
     </values>
 </CustomMetadata>

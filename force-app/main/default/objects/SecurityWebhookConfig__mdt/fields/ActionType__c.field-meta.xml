@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>ActionType__c</fullName>
+    <caseSensitive>false</caseSensitive>
     <description>SOAR에서 전달하는 Webhook 액션의 고유 식별자 (예: NOTIFY_SLACK)</description>
     <externalId>false</externalId>
     <fieldManageability>SubscriberControlled</fieldManageability>

@@ -3,7 +3,6 @@
     <fullName>IsActive__c</fullName>
     <defaultValue>true</defaultValue>
     <description>해당 웹훅 설정의 활성화 여부</description>
-    <externalId>false</externalId>
     <fieldManageability>SubscriberControlled</fieldManageability>
     <label>Is Active</label>
     <type>Checkbox</type>

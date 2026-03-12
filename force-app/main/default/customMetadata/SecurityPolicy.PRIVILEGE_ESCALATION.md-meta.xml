@@ -3,8 +3,16 @@
     <label>PRIVILEGE_ESCALATION</label>
     <protected>false</protected>
     <values>
+        <field>ActionButtons__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
         <field>ActionCritical__c</field>
         <value xsi:type="xsd:string">FREEZE_USER;NOTIFY_SLACK</value>
+    </values>
+    <values>
+        <field>ActionHigh__c</field>
+        <value xsi:nil="true"/>
     </values>
     <values>
         <field>ActionLow__c</field>
@@ -12,6 +20,10 @@
     </values>
     <values>
         <field>ActionMedium__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ActionTypes__c</field>
         <value xsi:nil="true"/>
     </values>
     <values>
@@ -23,7 +35,23 @@
         <value xsi:type="xsd:string">PRIVILEGE_ESCALATION</value>
     </values>
     <values>
+        <field>Severity__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
         <field>ThresholdCritical__c</field>
-        <value xsi:type="xsd:double">1</value>
+        <value xsi:type="xsd:double">1.0</value>
+    </values>
+    <values>
+        <field>ThresholdHigh__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ThresholdLow__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ThresholdMedium__c</field>
+        <value xsi:nil="true"/>
     </values>
 </CustomMetadata>
