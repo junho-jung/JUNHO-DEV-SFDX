@@ -8,8 +8,8 @@
   1.0      2026-01-30      jh.jung           Created
 */
 
-public class SecurityUserWarningAction extends SecurityBaseAction {
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+global class SecurityUserWarningAction extends SecurityBaseAction {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         String userEmail = String.valueOf(payloadMap.get('userEmail'));
         if (String.isBlank(userEmail)) return;
 

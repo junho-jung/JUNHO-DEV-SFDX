@@ -18,7 +18,7 @@ global without sharing class IF_SecurityActionController {
         SecuritySoarTrace.log('IF_SecurityActionController.doGet', new Map<String, Object>{
             'requestUri' => req != null ? req.requestURI : null
         });
-        InboundRestHandler.run(req, res, 'SecurityAction', new SecurityActionInboundHandler());
+        SecurityInboundRestHandler.run(req, res, 'SecurityAction', new SecurityActionInboundHandler());
     }
 
     /** 서버 간 호출 등에서 POST 사용 */
@@ -29,6 +29,6 @@ global without sharing class IF_SecurityActionController {
         SecuritySoarTrace.log('IF_SecurityActionController.doPost', new Map<String, Object>{
             'requestUri' => req != null ? req.requestURI : null
         });
-        InboundRestHandler.run(req, res, 'SecurityAction', new SecurityActionInboundHandler());
+        SecurityInboundRestHandler.run(req, res, 'SecurityAction', new SecurityActionInboundHandler());
     }
 }

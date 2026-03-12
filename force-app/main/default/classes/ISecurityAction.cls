@@ -10,6 +10,6 @@
 /**
  * 모든 보안 처리 클래스가 구현해야 할 공통 인터페이스
  */
-public interface ISecurityAction {
+global interface ISecurityAction {
     void execute(String payloadJson);
 }

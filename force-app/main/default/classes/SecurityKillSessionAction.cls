@@ -14,9 +14,9 @@
  * 호출 진입점: 인터셉터(SecurityAlertHandler), LWC, 인바운드(팀즈 링크 클릭) 등 다양한 경로에서 사용 가능.
  * @param payloadJson { "userId": "005...", "eventKey": "...", "policyCode": "..." }
  */
-public without sharing class SecurityKillSessionAction extends SecurityBaseAction {
+global without sharing class SecurityKillSessionAction extends SecurityBaseAction {
 
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         if (String.isBlank(targetUserId)) {
             SecuritySoarTrace.log('SecurityKillSessionAction.execute.skip', new Map<String, Object>{ 'reason' => 'targetUserId is null' });
             return;

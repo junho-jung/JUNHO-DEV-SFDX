@@ -2,9 +2,9 @@
  * @Description 인증된 기기(모바일 앱, API 등)의 모든 OAuth 토큰을 일괄 만료(삭제)하여
  *              외부 연결을 즉시 끊어버리는 액션.
  */
-public with sharing class SecurityRevokeOauthTokensAction extends SecurityBaseAction {
+global with sharing class SecurityRevokeOauthTokensAction extends SecurityBaseAction {
     
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         if (String.isBlank(targetUserId)) {
             SecuritySoarTrace.log('SecurityRevokeOauthTokensAction.execute.NoUserId');
             return;

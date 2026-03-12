@@ -17,30 +17,30 @@ public with sharing class SecurityActionInboundHandler implements IInboundAction
     /**
      * [2→3단계] 인바운드 비즈니스 로직. 출처 검사 → 파라미터 파싱 → 토큰 검증 → SecurityInboundAction__mdt 기반 액션 실행
      */
-    public InboundRestHandler.InboundResult run(String method, String requestBody, Map<String, String> queryParams) {
+    public SecurityTypes.InboundResult run(String method, String requestBody, Map<String, String> queryParams) {
         SecuritySoarTrace.log('SecurityActionInboundHandler.run.start', new Map<String, Object>{
-            'method' => method,
-            'hasBody' => String.isNotBlank(requestBody),
-            'hasQueryParams' => queryParams != null && !queryParams.isEmpty()
+                'method' => method,
+                'hasBody' => String.isNotBlank(requestBody),
+                'hasQueryParams' => queryParams != null && !queryParams.isEmpty()
         });
         // [Kill-Switch] 시스템 비활성화 시 503
         if (!SecurityKillSwitch.isEnabled()) {
-            return InboundRestHandler.resultError(503, 'Security system temporarily disabled');
+            return new SecurityTypes.InboundResult(503, 'Security system temporarily disabled');
         }
 
         SecuritySoarTrace.log('SecurityActionInboundHandler.run.context', new Map<String, Object>{
-            'requestURI' => RestContext.request != null ? RestContext.request.requestURI : null
+                'requestURI' => RestContext.request != null ? RestContext.request.requestURI : null
         });
-        
+
         // 팀즈 외 다른 경로(직접 URL 입력 등) 차단
         if (!SecurityInboundToken.isRequestFromAllowedOrigin(RestContext.request)) {
-            return InboundRestHandler.resultError(403, 'Request origin not allowed');
+            return new SecurityTypes.InboundResult(403, 'Request origin not allowed');
         }
         // [Webhook Signature] POST/PATCH 시 본문 서명 검증 (설정 시)
         if (('POST'.equalsIgnoreCase(method) || 'PATCH'.equalsIgnoreCase(method)) && String.isNotBlank(requestBody)) {
             String sigErr = SecurityInboundToken.verifyWebhookSignature(requestBody, RestContext.request);
             if (sigErr != null) {
-                return InboundRestHandler.resultError(401, sigErr);
+                return new SecurityTypes.InboundResult(401, sigErr);
             }
         }
         String token = null;
@@ -53,18 +53,18 @@ public with sharing class SecurityActionInboundHandler implements IInboundAction
                 Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(requestBody);
                 token = (String) body.get('token');
             } catch (Exception e) {
-                return InboundRestHandler.resultError(400, 'Invalid JSON body: ' + e.getMessage());
+                return new SecurityTypes.InboundResult(400, 'Invalid JSON body: ' + e.getMessage());
             }
         }
 
         if (String.isBlank(token)) {
-            return InboundRestHandler.resultError(400, 'Missing required parameter: token');
+            return new SecurityTypes.InboundResult(400, 'Missing required parameter: token');
         }
 
         // 2. 토큰 복호화 및 유효시간/위조 검사
         Map<String, String> decryptedPayload = SecurityInboundToken.decryptAndVerifyToken(token);
         if (decryptedPayload == null) {
-            return InboundRestHandler.resultError(403, 'Invalid, missing, or expired encrypted token');
+            return new SecurityTypes.InboundResult(403, 'Invalid, missing, or expired encrypted token');
         }
 
         String action = decryptedPayload.get('action');
@@ -74,19 +74,19 @@ public with sharing class SecurityActionInboundHandler implements IInboundAction
         String timestampParam = decryptedPayload.get('t');
 
         if (String.isBlank(action) || String.isBlank(userId)) {
-            return InboundRestHandler.resultError(400, 'Corrupted token payload: missing required fields');
+            return new SecurityTypes.InboundResult(400, 'Corrupted token payload: missing required fields');
         }
 
         SecurityInboundAction__mdt actionMdt = resolveInboundAction(action);
         if (actionMdt == null) {
-            return InboundRestHandler.resultError(400, 'Unsupported action: ' + action);
+            return new SecurityTypes.InboundResult(400, 'Unsupported action: ' + action);
         }
 
         if (actionMdt.RequiresToken__c == True) {
             // [JTI] 사용된 토큰 재사용 차단(Replay Attack 방어) - 이종 액션 버튼 동시 허용(JTI 단위 = EventKey + Timestamp + ActionType)
             Long ts = parseTimestamp(timestampParam);
             if (ts != null && SecurityInboundToken.isTokenUsed(eventKey, ts, action)) {
-                return InboundRestHandler.resultError(403, 'Token already used (Replay attack prevention)');
+                return new SecurityTypes.InboundResult(403, 'Token already used (Replay attack prevention)');
             }
             SecurityInboundToken.markTokenUsed(eventKey, ts, action);
         }
@@ -96,23 +96,23 @@ public with sharing class SecurityActionInboundHandler implements IInboundAction
             // [FIX] 직접 실행 및 콜아웃을 제거하고, SecurityPrivilegeEscalator를 통해 플랫폼 이벤트를 중앙 집중적으로 발행
             SecurityPrivilegeEscalator.executeAsSystem(action.trim().toUpperCase(), payloadJson);
 
-            InboundRestHandler.InboundResult ok = InboundRestHandler.resultOk(new Map<String, Object>{
-                'success' => true,
-                'action' => action.trim().toUpperCase(),
-                'message' => 'Action event published'
-            });
+            SecurityTypes.InboundResult ok = new SecurityTypes.InboundResult(200, JSON.serialize(new Map<String, Object>{
+                    'success' => true,
+                    'action' => action.trim().toUpperCase(),
+                    'message' => 'Action event published'
+            }));
             SecuritySoarTrace.log('SecurityActionInboundHandler.run.success', new Map<String, Object>{
-                'action' => action != null ? action.trim().toUpperCase() : null,
-                'userId' => userId
+                    'action' => action != null ? action.trim().toUpperCase() : null,
+                    'userId' => userId
             });
             return ok;
         } catch (Exception e) {
             SecuritySoarTrace.log('SecurityActionInboundHandler.run.error', new Map<String, Object>{
-                'action' => action,
-                'userId' => userId,
-                'message' => e != null ? e.getMessage() : null
+                    'action' => action,
+                    'userId' => userId,
+                    'message' => e != null ? e.getMessage() : null
             });
-            return InboundRestHandler.resultError(500, e.getMessage());
+            return new SecurityTypes.InboundResult(500, e.getMessage());
         }
     }
 
@@ -121,15 +121,15 @@ public with sharing class SecurityActionInboundHandler implements IInboundAction
         String key = action.trim().toUpperCase();
         try {
             List<SecurityInboundAction__mdt> rows = [
-                SELECT InboundActionType__c, ActionClassName__c, RequiresToken__c
-                FROM SecurityInboundAction__mdt
-                WHERE InboundActionType__c = :key
-                LIMIT 1
+                    SELECT InboundActionType__c, ActionClassName__c, RequiresToken__c
+                    FROM SecurityInboundAction__mdt
+                    WHERE InboundActionType__c = :key
+                    LIMIT 1
             ];
             return rows.isEmpty() ? null : rows[0];
         } catch (Exception e) {
             SecuritySoarTrace.log('SecurityActionInboundHandler.resolveInboundAction.error', new Map<String, Object>{
-                'errorMsg' => e.getMessage()
+                    'errorMsg' => e.getMessage()
             });
             return null;
         }
@@ -146,10 +146,10 @@ public with sharing class SecurityActionInboundHandler implements IInboundAction
 
     private static String buildPayloadJson(String userId, String eventKey, String policyCode) {
         Map<String, Object> payload = new Map<String, Object>{
-            'userId' => userId,
-            'eventKey' => eventKey,
-            'policyCode' => policyCode,
-            'source' => SecurityTypes.SOURCE_TEAMS_INBOUND // [수정] 상수 사용
+                'userId' => userId,
+                'eventKey' => eventKey,
+                'policyCode' => policyCode,
+                'source' => SecurityTypes.SOURCE_TEAMS_INBOUND // [수정] 상수 사용
         };
         return JSON.serialize(payload);
     }

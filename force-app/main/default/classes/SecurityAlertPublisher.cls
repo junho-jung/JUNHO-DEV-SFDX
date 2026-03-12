@@ -8,7 +8,7 @@
   ===================================================================================
   1.0      2026-02-04      jh.jung           Created
 */
-public with sharing class SecurityAlertPublisher {
+global with sharing class SecurityAlertPublisher {
 
     /**
      * @description 보안 경보 이벤트 발행
@@ -19,7 +19,7 @@ public with sharing class SecurityAlertPublisher {
      * @param rawEvent TxnSecurity로부터 전달받은 원본 SObject
      * @param user 대상 사용자 정보
      */
-    public static void publish(
+    global static void publish(
         String source, String policyCode, String severity, String actionType,
         SObject rawEvent, User user
     ) {
@@ -63,6 +63,15 @@ public with sharing class SecurityAlertPublisher {
 
         // 5. 발행 및 결과 처리 (실패 시 Fallback Queueable)
         emitEvent(alert);
+    }
+
+    /**
+     * @description 고객이 커스텀 EventExtractor를 동적으로 등록할 수 있는 통로
+     */
+    global static void registerExtractor(SObjectType type, IEventExtractor extractor) {
+        if (type != null && extractor != null) {
+            extractors.put(type, extractor);
+        }
     }
 
     /**
@@ -176,8 +185,9 @@ public with sharing class SecurityAlertPublisher {
     }
 
     // 데이터 전달용 내부 클래스
-    public class ResourceInfo {
-        public String id, name, type;
-        public void setValues(String i, String n, String t) { id = i; name = n; type = t; }
+    global class ResourceInfo {
+        global String id, name, type;
+        global ResourceInfo() {}
+        global void setValues(String i, String n, String t) { id = i; name = n; type = t; }
     }
 }

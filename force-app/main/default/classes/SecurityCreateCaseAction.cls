@@ -8,8 +8,8 @@
   1.0      2026-02-03      jh.jung           Created
 */
 
-public class SecurityCreateCaseAction extends SecurityBaseAction {
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+global class SecurityCreateCaseAction extends SecurityBaseAction {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         if (!Schema.sObjectType.Case.isCreateable()) {
             throw new SecurityException('No create access to Case.');
         }

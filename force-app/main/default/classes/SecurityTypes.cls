@@ -7,27 +7,37 @@
   ===================================================================================
   1.0      2026-02-03      jh.jung           Created
 */
-public class SecurityTypes {
+global class SecurityTypes {
 
     // 실행 방식
-    public enum ActionExecutionMode {
+    global enum ActionExecutionMode {
         SYNC,
         ASYNC
     }
 
     // [추가] 액션 발생 출처 고정 상수 (Hardcoding 방지)
-    public static final String SOURCE_TEAMS_INBOUND = 'TEAMS_INBOUND';
-    public static final String SOURCE_LWC_DASHBOARD = 'LWC_DASHBOARD';
-    public static final String SOURCE_MANUAL_OVERRIDE = 'MANUAL_OVERRIDE';
-    public static final String SOURCE_SYSTEM_ACTION = 'SYSTEM_ACTION';
-    public static final String SOURCE_INBOUND_COMMAND = 'INBOUND_COMMAND';
+    global static final String SOURCE_TEAMS_INBOUND = 'TEAMS_INBOUND';
+    global static final String SOURCE_LWC_DASHBOARD = 'LWC_DASHBOARD';
+    global static final String SOURCE_MANUAL_OVERRIDE = 'MANUAL_OVERRIDE';
+    global static final String SOURCE_SYSTEM_ACTION = 'SYSTEM_ACTION';
+    global static final String SOURCE_INBOUND_COMMAND = 'INBOUND_COMMAND';
+
+    // [추가] 인바운드 결과 래퍼 (InboundRestHandler 의존성 제거용 global 타입)
+    global class InboundResult {
+        global Integer statusCode;
+        global String body;
+        global InboundResult(Integer code, String b) {
+            this.statusCode = code;
+            this.body = b;
+        }
+    }
 
     // Action + 실행 정책 묶음
-    public class ActionDescriptor {
-        public ISecurityAction action;
-        public ActionExecutionMode mode;
+    global class ActionDescriptor {
+        global ISecurityAction action;
+        global ActionExecutionMode mode;
 
-        public ActionDescriptor(
+        global ActionDescriptor(
             ISecurityAction action,
             ActionExecutionMode mode
         ) {

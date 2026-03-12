@@ -9,13 +9,14 @@
   1.0      2026-01-30      jh.jung           Created
   1.1      2026-02-26      jh.jung           Fallback 지원, Kill-Switch, Throttling 추가
 */
-public class SecurityAlertHandler {
+global class SecurityAlertHandler {
 
     /** 플랫폼 이벤트 발행 실패 시 Fallback에서 사용하는 내부 레코드 형태 */
-    public class AlertRecord {
-        public String EventKey, Source, PolicyCode, Severity, ActionType;
-        public String UserId, UserName, ResourceId, ResourceName, ResourceType;
-        public String Payload;
+    global class AlertRecord {
+        global String EventKey, Source, PolicyCode, Severity, ActionType;
+        global String UserId, UserName, ResourceId, ResourceName, ResourceType;
+        global String Payload;
+        global AlertRecord() {}
     }
 
     /**

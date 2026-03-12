@@ -8,8 +8,8 @@
   1.0      2026-01-30      jh.jung           Created
 */
 
-public class SecurityNotifySlackAction extends SecurityBaseWebhookAction {
-    protected override String getActionType() {
+global class SecurityNotifySlackAction extends SecurityBaseWebhookAction {
+    global override String getActionType() {
         return 'NOTIFY_SLACK';
     }
 }

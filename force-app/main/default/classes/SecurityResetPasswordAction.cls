@@ -2,9 +2,9 @@
  * @Description 대상 유저의 비밀번호를 즉시 강제 초기화(Reset)하고
  *              초기화 메일을 시스템적으로 발송하도록 하는 액션 (System.resetPassword 호출).
  */
-public with sharing class SecurityResetPasswordAction extends SecurityBaseAction {
+global with sharing class SecurityResetPasswordAction extends SecurityBaseAction {
     
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         if (String.isBlank(targetUserId)) {
             SecuritySoarTrace.log('SecurityResetPasswordAction.execute.NoUserId');
             return;

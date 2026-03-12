@@ -2,9 +2,9 @@
  * @Description 알람 대상 유저의 직속 상사(User.Manager)에게 보안 위반 사실을
  *              이메일로 은밀하게 통보(Escalation)하는 액션.
  */
-public with sharing class SecurityNotifyManagerEmailAction extends SecurityBaseAction {
+global with sharing class SecurityNotifyManagerEmailAction extends SecurityBaseAction {
     
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         String policyCode = (String) payloadMap.get('PolicyCode');
         String severity = (String) payloadMap.get('Severity');
 

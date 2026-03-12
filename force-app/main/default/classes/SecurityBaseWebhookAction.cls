@@ -9,7 +9,7 @@
 * ===================================================================================
 * 1.0      2026-03-11      jh.jung           Created - Tier 2 Flyweight Webhook Action
 */
-public virtual class SecurityBaseWebhookAction extends SecurityBaseAction {
+global virtual class SecurityBaseWebhookAction extends SecurityBaseAction {
     
     // 서브 클래스가 구현해야 하는 훅 메서드
     protected virtual String getActionType() {
@@ -24,7 +24,7 @@ public virtual class SecurityBaseWebhookAction extends SecurityBaseAction {
         return originalPayloadJson;
     }
 
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         String actionType = getActionType();
         
         // 1. 메타데이터에서 연동 설정 가져오기

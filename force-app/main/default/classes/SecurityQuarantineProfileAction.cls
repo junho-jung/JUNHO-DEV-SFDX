@@ -2,9 +2,9 @@
  * @Description 대상 유저의 프로필을 인가된 권한이 없는 '격리(Quarantine)' 또는 '읽기 전용' 프로필로
  *              강제 할당하여 추가적인 데이터 유출 및 수정을 방지하는 액션.
  */
-public with sharing class SecurityQuarantineProfileAction extends SecurityBaseAction {
+global with sharing class SecurityQuarantineProfileAction extends SecurityBaseAction {
     
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         if (String.isBlank(targetUserId)) {
             SecuritySoarTrace.log('SecurityQuarantineProfileAction.execute.NoUserId');
             return;

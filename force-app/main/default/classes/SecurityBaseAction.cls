@@ -2,9 +2,9 @@
  * @Description Security 공통 Action 부모 클래스.
  *              반복되는 Payload 파싱, 사용자 ID 추출, 공통 로깅, 예외 처리를 추상화하여 제공합니다.
  */
-public abstract class SecurityBaseAction implements ISecurityAction {
+global abstract class SecurityBaseAction implements ISecurityAction {
     
-    public void execute(String payloadJson) {
+    global void execute(String payloadJson) {
         String actionName = String.valueOf(this).substringBefore(':');
         
         SecuritySoarTrace.log(actionName + '.execute.start', new Map<String, Object>{ 'payload' => payloadJson });
@@ -38,5 +38,5 @@ public abstract class SecurityBaseAction implements ISecurityAction {
      * @param targetUserId 추출된 대상 User Id (없는 경우 null/blank)
      * @param originalPayloadJson 원본 JSON 문자열
      */
-    protected abstract void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson);
+    global abstract void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson);
 }

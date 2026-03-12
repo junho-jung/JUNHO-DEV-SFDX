@@ -2,9 +2,9 @@
  * @Description 대상 유저의 로그인을 원천 차단하기 위해 계정을 동결(Freeze) 처리하는 액션.
  *              심각한 임계치(Critical) 위반 시 자동 방어 또는 관리자의 킬 세션 조치 등과 함께 사용됩니다.
  */
-public with sharing class SecurityFreezeUserAction extends SecurityBaseAction {
+global with sharing class SecurityFreezeUserAction extends SecurityBaseAction {
     
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         if (String.isBlank(targetUserId)) {
             SecuritySoarTrace.log('SecurityFreezeUserAction.execute.NoUserId');
             return;

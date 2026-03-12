@@ -8,8 +8,8 @@
   1.0      2026-02-03      jh.jung           Created
 */
 
-public class SecurityRestrictPermissionAction extends SecurityBaseAction {
-    protected override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
+global class SecurityRestrictPermissionAction extends SecurityBaseAction {
+    global override void doExecute(Map<String, Object> payloadMap, String targetUserId, String originalPayloadJson) {
         if (!Schema.sObjectType.PermissionSetAssignment.isDeletable()) {
             throw new SecurityException('No delete access to PermissionSetAssignment.');
         }
