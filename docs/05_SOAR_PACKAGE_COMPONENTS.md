@@ -65,11 +65,11 @@
 
 | Class Name | 설명 및 역할 | SOAR | Pkg | 💡 Rename To-Be |
 | :--- | :--- | :---: | :---: | :--- |
-| `SecurityGuard` | 이벤트 유형별 위험도를 분석하는 중앙 퍼사드 (God Class) | 🔵 | 🟢 | ① `SecurityPolicyEvaluator` ② `SecurityThreatAnalyzer` ③ `SecurityEventAssessor` |
+| `SecurityGuard` | 이벤트 유형별 위험도를 분석하는 중앙 퍼사드 (God Class) | 🔵 | 🟢 |  `SecurityPolicyEvaluator`  `SecurityThreatAnalyzer`  `SecurityEventAssessor` |
 | `SecurityMetadataRegistry` | `SecurityPolicy__mdt` 등 메타데이터 1회 조회/캐싱 (Singleton) | 🔵 | 🟢 | - |
 | `SecurityKillSwitch` | Emergency 비상 정지 스위치 유틸 | 🔵 | 🟢 | - |
 | `SecurityPrivilegeEscalator` | System 모드(Without Sharing) 강제 실행 헬퍼 | 🔵 | 🟢 | - |
-| `SecurityValidator` | LWC/API 접근 권한 및 관리자 예외 체크 유틸 | 🔵 | 🟢 | ① `SecurityAccessChecker` ② `SecurityPermissionValidator` |
+| `SecurityValidator` | LWC/API 접근 권한 및 관리자 예외 체크 유틸 | 🔵 | 🟢 |  `SecurityAccessChecker`  `SecurityPermissionValidator` |
 | `SecurityFilterChain` | 검증기들을 체인으로 묶어 관리하는 기능 | 🔵 | 🟢 | - |
 | `ISecurityFilter` | 필터 체인에 들어가는 개별 필터의 인터페이스 | 🔵 | 🟢 | - |
 | `SecurityThrottleFilter` | 알람 중복 폭주 방지 스로틀링 필터 | 🔵 | 🟢 | - |
@@ -136,7 +136,7 @@
 | :--- | :--- | :---: | :---: | :--- |
 | `SecurityDashboardController` | LWC 보안 대시보드 API (수동 방어 위임) | 🔵 | 🟢 | - |
 | `SecurityDemoController` | LWC 시뮬레이터에서 모의 이벤트 발행 API | 🔵 | 🟢 | - |
-| `IF_SecurityActionController` | Site(Guest)를 통한 외부 버튼 클릭 REST 진입점 | 🔵 | 🟢 | ① `SecurityInboundRestController` ② `SecurityWebhookEndpoint` |
+| `IF_SecurityActionController` | Site(Guest)를 통한 외부 버튼 클릭 REST 진입점 | 🔵 | 🟢 |  `SecurityInboundRestController`  `SecurityWebhookEndpoint` |
 | `SecurityActionRequest_tr` | `SecurityActionRequest__e` 이벤트의 실행 핸들러 | 🔵 | 🟢 | - |
 | `IInboundAction` | 외부 인바운드 페이로드 처리 인터페이스 | 🔵 | 🟢 | - |
 | `SecurityInboundToken` | JWT 서명/시크릿 검증 유틸 | 🔵 | 🟢 | - |
@@ -152,7 +152,7 @@
 
 | Class Name | 설명 및 역할 | SOAR | Pkg | 💡 Rename To-Be |
 | :--- | :--- | :---: | :---: | :--- |
-| `SecurityInterfaceBridge` | 액션을 구형 Interface 프레임워크로 전달하는 중계기 | 🔵 (과거) | ❌ | ① `SecurityActionDispatcher` ② `SecurityLegacyBridge` |
+| `SecurityInterfaceBridge` | 액션을 구형 Interface 프레임워크로 전달하는 중계기 | 🔵 (과거) | ❌ |  `SecurityActionDispatcher`  `SecurityLegacyBridge` |
 | `SecurityNotifyTeamsLegacyAction` | 구형 설정 기반 Teams 레거시 발송기 | 🔵 (과거) | ❌ | - (삭제 후보) |
 | `SecurityIntegrationConfig` | Registry 이전 사용된 구형 메타데이터 조회 더미 | 🔵 (과거) | ❌ | - (삭제 후보) |
 
@@ -251,9 +251,9 @@
 
 | As-Is | 💡 To-Be 추천 | 사유 |
 | :--- | :--- | :--- |
-| `SecurityGuard` | ① `SecurityPolicyEvaluator` ② `SecurityThreatAnalyzer` ③ `SecurityEventAssessor` | God Class. 이름이 "경비원"이지만 실제로는 정책 평가·위협 분석·이벤트 판단까지 하는 다기능 클래스 |
-| `SecurityValidator` | ① `SecurityAccessChecker` ② `SecurityPermissionValidator` | "검증기"라는 모호한 이름이 실제 접근 제어/관리자 예외 검증 역할을 반영 못함 |
-| `IF_SecurityActionController` | ① `SecurityInboundRestController` ② `SecurityWebhookEndpoint` | `IF_` 접두어가 Interface 레거시 네이밍 잔재. REST 컨트롤러 역할에 맞게 변경 권고 |
+| `SecurityGuard` |  `SecurityPolicyEvaluator`  `SecurityThreatAnalyzer`  `SecurityEventAssessor` | God Class. 이름이 "경비원"이지만 실제로는 정책 평가·위협 분석·이벤트 판단까지 하는 다기능 클래스 |
+| `SecurityValidator` |  `SecurityAccessChecker`  `SecurityPermissionValidator` | "검증기"라는 모호한 이름이 실제 접근 제어/관리자 예외 검증 역할을 반영 못함 |
+| `IF_SecurityActionController` |  `SecurityInboundRestController`  `SecurityWebhookEndpoint` | `IF_` 접두어가 Interface 레거시 네이밍 잔재. REST 컨트롤러 역할에 맞게 변경 권고 |
 | `SecurityAuditLog__c` | `SecurityUserState__c` | "감사 로그"가 아니라 유저별 누적 상태(AlertCount) 보관소이므로 역할과 불일치 |
 | `SecurityInboundConfig__mdt` | `SecurityGlobalConfig__mdt` | "인바운드 설정"인데 실제 킬스위치·스로틀 등 글로벌 환경 전체를 관리 |
 
@@ -261,7 +261,7 @@
 
 | As-Is | 💡 To-Be 추천 | 사유 |
 | :--- | :--- | :--- |
-| `SecurityInterfaceBridge` | ① `SecurityActionDispatcher` ② `SecurityLegacyBridge` | 역할(액션 전달)과 이름(브릿지)의 괴리 |
+| `SecurityInterfaceBridge` |  `SecurityActionDispatcher`  `SecurityLegacyBridge` | 역할(액션 전달)과 이름(브릿지)의 괴리 |
 | `SecurityIntegration__mdt` | `SecurityActionRoute__mdt` | "통합"이 아니라 "액션-큐 라우팅 매핑" 역할 |
 
 > [!NOTE]
